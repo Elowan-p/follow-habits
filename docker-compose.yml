@@ -1,0 +1,25 @@
+services:
+  db:
+    image: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootPassword
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootPassword
+    depends_on:
+      - db
+
+# C'est ici qu'il ne faut qu'UN SEUL bloc "volumes"
+volumes:
+  db_data:
