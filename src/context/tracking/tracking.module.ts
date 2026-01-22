@@ -13,5 +13,6 @@ import { TrackingRepositoryInterface } from './tracking.repository.interface';
     TrackingService,
     { provide: TrackingRepositoryInterface, useClass: TrackingRepository },
   ],
+  exports: [TrackingRepositoryInterface],
 })
 export class TrackingModule {}

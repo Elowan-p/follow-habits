@@ -26,4 +26,8 @@ export class UsersRepository implements UsersRepositoryInterface {
   async remove(user: UserEntity): Promise<UserEntity> {
     return this.repository.remove(user);
   }
+
+  async create(user: UserEntity): Promise<UserEntity> {
+    return this.repository.save(user);
+  }
 }

@@ -5,4 +5,5 @@ export abstract class UsersRepositoryInterface {
   abstract findOneById(id: string): Promise<UserEntity | null>;
   abstract update(user: UserEntity): Promise<UserEntity>;
   abstract remove(user: UserEntity): Promise<UserEntity>;
+  abstract create(user: UserEntity): Promise<UserEntity>;
 }

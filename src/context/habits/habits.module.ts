@@ -13,5 +13,6 @@ import { HabitsRepository } from './habits.repository';
     HabitsService,
     { provide: HabitsRepositoryInterface, useClass: HabitsRepository },
   ],
+  exports: [HabitsRepositoryInterface],
 })
 export class HabitsModule {}

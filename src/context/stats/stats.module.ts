@@ -6,8 +6,15 @@ import { StatEntity } from './entities/stats.entity';
 import { StatsRepositoryInterface } from './stats.repository.interface';
 import { StatsRepository } from './stats.repository';
 
+import { HabitsModule } from '../habits/habits.module';
+import { TrackingModule } from '../tracking/tracking.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([StatEntity])],
+  imports: [
+    TypeOrmModule.forFeature([StatEntity]),
+    HabitsModule,
+    TrackingModule,
+  ],
   controllers: [StatsController],
   providers: [
     StatsService,

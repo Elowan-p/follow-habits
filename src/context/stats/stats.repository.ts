@@ -16,7 +16,7 @@ export class StatsRepository implements StatsRepositoryInterface {
   }
 
   async findAllByUserId(userId: string): Promise<StatEntity[]> {
-    return this.repository.find({ where: { userId } });
+    return this.repository.find({ where: { user: { id: userId } } });
   }
 
   async findOne(id: string): Promise<StatEntity | null> {

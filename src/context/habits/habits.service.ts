@@ -12,7 +12,8 @@ export class HabitsService {
     habit.name = CreateHabitDTO.name;
     habit.description = CreateHabitDTO.description;
 
-    habit.userId = '00000000-0000-0000-0000-000000000000';
+    // TODO: Get real user from request
+    habit.user = { id: '00000000-0000-0000-0000-000000000000' } as any;
 
     return this.habitsRepository.create(habit);
   }

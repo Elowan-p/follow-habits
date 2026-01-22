@@ -7,8 +7,11 @@ export class LoginPresenter {
   @Expose()
   message: string;
 
-  @ApiProperty({ type: UserPresenter })
+  @ApiProperty()
   @Expose()
-  @Type(() => UserPresenter)
-  data: UserPresenter;
+  access_token: string;
+
+  @ApiProperty()
+  @Expose()
+  refresh_token: string;
 }

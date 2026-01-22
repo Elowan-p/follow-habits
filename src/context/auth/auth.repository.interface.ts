@@ -8,4 +8,5 @@ export abstract class AuthRepositoryInterface {
   abstract createCredential(userCredential: AuthCredentialEntity): Promise<AuthCredentialEntity>;
   abstract updateCredential(userCredential: AuthCredentialEntity): Promise<AuthCredentialEntity>;
   abstract deleteCredential(userCredential: AuthCredentialEntity): Promise<AuthCredentialEntity>;
+  abstract updateRefreshToken(id: string, refreshTokenHashed: string | null): Promise<void>;
 }

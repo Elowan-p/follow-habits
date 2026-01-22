@@ -8,9 +8,9 @@ export class StatsPresenter {
 
   @ApiProperty()
   @Expose()
-  completedTrackings: number;
+  totalTrackings: number;
 
   @ApiProperty()
   @Expose()
-  successRate: string;
+  completionRate: string;
 }

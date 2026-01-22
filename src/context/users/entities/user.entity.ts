@@ -4,7 +4,12 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  OneToMany,
 } from 'typeorm';
+import { AuthCredentialEntity } from '../../auth/entities/auth-credential.entity';
+import { HabitEntity } from '../../habits/entities/habit.entity';
+import { StatEntity } from '../../stats/entities/stats.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -22,4 +27,14 @@ export class UserEntity {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToOne(() => AuthCredentialEntity, (auth) => auth.user)
+  auth: AuthCredentialEntity;
+
+  // Placeholder for other relations to avoid errors before defining them
+  @OneToMany(() => HabitEntity, (habit) => habit.user)
+  habits: HabitEntity[];
+
+  @OneToMany(() => StatEntity, (stat) => stat.user)
+  stats: StatEntity[];
 }

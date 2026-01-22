@@ -15,7 +15,7 @@ import { plainToInstance } from 'class-transformer';
 import { FindAllPresenter } from './presenter/findAll.presenter';
 import { FindOnePresenter } from './presenter/findOne.presenter';
 import { UpdateUserDTO } from './dto/update-user.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Users')
 @Controller('users')
@@ -33,15 +33,17 @@ export class UsersController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get user by id' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: FindOnePresenter })
   @HttpCode(HttpStatus.OK)
-  findOne(@Param() params: usersType.findOneDTO) {
-    const response = this.usersService.findOne(params);
+  findOne(@Param('id') id: string) {
+    const response = this.usersService.findOne({ id });
     return plainToInstance(FindOnePresenter, response);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update user' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: FindOnePresenter })
   @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() body: UpdateUserDTO) {
@@ -51,6 +53,7 @@ export class UsersController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: FindOnePresenter })
   @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {

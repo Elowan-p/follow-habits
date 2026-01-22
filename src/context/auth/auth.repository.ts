@@ -28,4 +28,8 @@ export class AuthRepository implements AuthRepositoryInterface {
     async deleteCredential(authCredential: AuthCredentialEntity): Promise<AuthCredentialEntity>{
         return this.credentialRepository.remove(authCredential)
     }
+
+    async updateRefreshToken(id: string, refreshTokenHashed: string | null): Promise<void> {
+        await this.credentialRepository.update(id, { refreshTokenHashed: refreshTokenHashed ?? undefined });
+    }
 }

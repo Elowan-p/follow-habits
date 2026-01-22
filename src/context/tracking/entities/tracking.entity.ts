@@ -3,15 +3,17 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { HabitEntity } from '../../habits/entities/habit.entity';
 
 @Entity('trackings')
 export class TrackingEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uuid' })
-  habitId: string;
+  @ManyToOne(() => HabitEntity, (habit) => habit.trackings, { onDelete: 'CASCADE' })
+  habit: HabitEntity;
 
   @Column({ type: 'datetime' })
   date: Date;

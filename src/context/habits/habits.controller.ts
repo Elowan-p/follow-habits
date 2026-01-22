@@ -14,7 +14,7 @@ import { CreateHabitDTO } from './dto/create-habit.dto';
 import { UpdateHabitDTO } from './dto/update-habit.dto';
 import { HabitPresenter } from './presenter/habit.presenter';
 import { plainToInstance } from 'class-transformer';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Habits')
 @Controller('habits')
@@ -41,6 +41,7 @@ export class HabitsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get habit by id' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: HabitPresenter })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
@@ -50,6 +51,7 @@ export class HabitsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update habit' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: HabitPresenter })
   @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() updateHabitDto: UpdateHabitDTO) {
@@ -59,6 +61,7 @@ export class HabitsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete habit' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: HabitPresenter })
   @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {

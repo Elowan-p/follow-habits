@@ -1,24 +1,88 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { AuthRepositoryInterface } from './auth.repository.interface';
 import { loginDTO } from './dto/login.dto';
 import { registerDTO } from './dto/register.dto';
 import { AuthCredentialEntity } from './entities/auth-credential.entity';
+import { IJwtService } from './jwt.ports';
+
+import { UsersRepositoryInterface } from '../users/users.repository.interface';
+import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
   // eslint-disable-next-line prettier/prettier
   constructor(
     private readonly authRepository: AuthRepositoryInterface,
+    @Inject(IJwtService)
+    private readonly jwtService: IJwtService,
+    private readonly usersRepository: UsersRepositoryInterface,
   ) {}
 
   async register(body: registerDTO) {
-    const user = new AuthCredentialEntity();
+    // 1. Create AuthCredential
+    const authCredential = new AuthCredentialEntity();
+    authCredential.email = body.email;
+    authCredential.passwordHashed = await bcrypt.hash(body.password, 10);
+    const savedAuth = await this.authRepository.createCredential(authCredential);
+
+    // 2. Create User Profile
+    const user = new UserEntity();
     user.email = body.email;
-    user.passwordHashed = body.password;
-    return this.authRepository.createCredential(user);
+    user.name = body.username;
+    user.auth = savedAuth;
+    await this.usersRepository.create(user);
+    
+    return savedAuth;
   }
 
   async login(body: loginDTO) {
-    return this.authRepository.findCredentialByEmail(body.email);
+    const user = await this.authRepository.findCredentialByEmail(body.email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isMatch = await bcrypt.compare(body.password, user.passwordHashed);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = { email: user.email, sub: user.id };
+    const tokens = this.jwtService.signToken(payload);
+
+    const refreshTokenHashed = await bcrypt.hash(tokens.refresh_token, 10);
+    await this.authRepository.updateRefreshToken(user.id, refreshTokenHashed);
+
+    return tokens;
+  }
+
+  async refresh(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verifyToken(refreshToken);
+      const user = await this.authRepository.findCredentialByEmail(payload.email);
+
+      if (!user || !user.refreshTokenHashed) {
+        throw new UnauthorizedException('Access denied');
+      }
+
+      const isRefreshTokenMatching = await bcrypt.compare(
+        refreshToken,
+        user.refreshTokenHashed,
+      );
+
+      if (!isRefreshTokenMatching) {
+        throw new UnauthorizedException('Access denied');
+      }
+
+      const newPayload = { email: user.email, sub: user.id };
+      const tokens = this.jwtService.signToken(newPayload);
+
+      const refreshTokenHashed = await bcrypt.hash(tokens.refresh_token, 10);
+      await this.authRepository.updateRefreshToken(user.id, refreshTokenHashed);
+
+      return tokens;
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 }

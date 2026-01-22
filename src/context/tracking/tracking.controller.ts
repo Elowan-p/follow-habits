@@ -14,7 +14,7 @@ import { CreateTrackingDTO } from './dto/create-tracking.dto';
 import { UpdateTrackingDTO } from './dto/update-tracking.dto';
 import { TrackingPresenter } from './presenter/tracking.presenter';
 import { plainToInstance } from 'class-transformer';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Tracking')
 @Controller('tracking')
@@ -41,6 +41,7 @@ export class TrackingController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get tracking by id' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: TrackingPresenter })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
@@ -50,6 +51,7 @@ export class TrackingController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update tracking' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: TrackingPresenter })
   @HttpCode(HttpStatus.OK)
   update(
@@ -62,6 +64,7 @@ export class TrackingController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete tracking' })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: TrackingPresenter })
   @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {

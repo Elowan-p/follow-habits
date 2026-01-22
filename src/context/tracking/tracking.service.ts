@@ -12,7 +12,7 @@ export class TrackingService {
 
   async create(createTrackingDto: CreateTrackingDTO) {
     const tracking = new TrackingEntity();
-    tracking.habitId = createTrackingDto.habitId;
+    tracking.habit = { id: createTrackingDto.habitId } as any;
     tracking.status = createTrackingDto.status;
     tracking.date = new Date(createTrackingDto.date);
 
