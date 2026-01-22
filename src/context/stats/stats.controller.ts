@@ -1,17 +1,13 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { StatsPresenter } from './presenter/stats.presenter';
 import { plainToInstance } from 'class-transformer';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 @ApiTags('Stats')
 @Controller('stats')
 export class StatsController {

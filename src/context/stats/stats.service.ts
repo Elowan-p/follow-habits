@@ -1,14 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { StatsRepositoryInterface } from './stats.repository.interface';
-import { CreateStatDTO } from './dto/create-stat.dto';
-import { UpdateStatDTO } from './dto/update-stat.dto';
-import { StatEntity } from './entities/stats.entity';
-
-import { Utils } from '...'; // Not needed but just cleaning up
+import { Injectable } from '@nestjs/common';
 import { HabitsRepositoryInterface } from '../habits/habits.repository.interface';
 import { TrackingRepositoryInterface } from '../tracking/tracking.repository.interface';
 
-@Injectable()
+import { Injectable } from '@nestjs/common';
 export class StatsService {
   constructor(
     private readonly habitsRepository: HabitsRepositoryInterface,
