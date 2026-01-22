@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './context/auth/auth.module';
+import { UsersModule } from './context/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
@@ -38,6 +39,7 @@ import { join } from 'path';
     }),
 
     AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
