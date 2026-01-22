@@ -1,64 +1,64 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { StatsRepositoryInterface } from './stats.repository.interface';
 import { CreateStatDTO } from './dto/create-stat.dto';
 import { UpdateStatDTO } from './dto/update-stat.dto';
-
-interface Stat {
-  id: string;
-  userId: string;
-  value: number;
-}
+import { StatEntity } from './entities/stats.entity';
 
 @Injectable()
 export class StatsService {
-  private stats: Stat[] = [
-    { id: '1', userId: '1', value: 100 },
-  ];
+  constructor(private readonly statsRepository: StatsRepositoryInterface) {}
 
-  create(createStatDto: CreateStatDTO) {
-    const stat: Stat = { id: Date.now().toString(), ...createStatDto };
-    this.stats.push(stat);
-    return {
-      ...stat,
-      totalHabits: 5,
-      completedTrackings: 20,
-      successRate: '80%',
-    }; // Mocking return for presenter
-  }
+  async create(CreateStatDTO: CreateStatDTO) {
+    const stat = new StatEntity();
+    stat.userId = CreateStatDTO.userId;
+    stat.value = CreateStatDTO.value;
 
-  getStats() {
+    const savedStat = await this.statsRepository.create(stat);
+
     return {
-      totalHabits: 5,
-      completedTrackings: 20,
-      successRate: '80%',
+      ...savedStat,
+      totalHabit: 0,
+      completedTracking: 0,
+      totalTracking: 0,
     };
   }
 
-  update(id: string, updateStatDto: UpdateStatDTO) {
-    const statIndex = this.stats.findIndex(s => s.id === id);
-    if (statIndex > -1) {
-      this.stats[statIndex] = { ...this.stats[statIndex], ...updateStatDto };
-      return {
-        ...this.stats[statIndex],
-        totalHabits: 5,
-        completedTrackings: 20,
-        successRate: '80%',
-      };
-    }
-    return null;
+  async getStats() {
+    const stats = await this.statsRepository.findAllByUserId('some-user-id'); // À adapter
+
+    return {
+      totalHabits: stats.length,
+      completedTrackings: 0,
+      successRate: '0%',
+    };
   }
 
-  remove(id: string) {
-    const statIndex = this.stats.findIndex(s => s.id === id);
-    if (statIndex > -1) {
-      const deletedStat = this.stats[statIndex];
-      this.stats.splice(statIndex, 1);
-      return {
-        ...deletedStat,
-        totalHabits: 5,
-        completedTrackings: 20,
-        successRate: '80%',
-      };
-    }
-    return null;
+  async update(id: string, updateStatDTO: UpdateStatDTO) {
+    const stat = await this.statsRepository.findOne(id);
+    if (!stat) throw new NotFoundException('Statistique non trouvée');
+
+    const updateStatEntity = { ...stat, ...updateStatDTO } as StatEntity;
+    const savedStat = await this.statsRepository.update(updateStatEntity);
+
+    return {
+      ...savedStat,
+      totalHabit: 0,
+      completedTracking: 0,
+      successRate: '0%',
+    };
+  }
+
+  async remove(id: string) {
+    const stat = await this.statsRepository.findOne(id);
+    if (!stat) throw new NotFoundException('Statistique non trouvée');
+
+    const removed = await this.statsRepository.remove(stat);
+
+    return {
+      ...removed,
+      totalHabits: 0,
+      completedTrackings: 0,
+      successRate: '0%',
+    };
   }
 }

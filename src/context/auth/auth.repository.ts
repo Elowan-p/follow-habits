@@ -1,31 +1,31 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserCredentialEntity } from "./entities/user-credential.entity";
+import { AuthCredentialEntity } from "./entities/auth-credential.entity";
 import { Repository } from "typeorm";
 
-import { AuthRepositoryInterface } from "../auth.repository.interface";
+import { AuthRepositoryInterface } from "./auth.repository.interface";
 
 @Injectable()
 export class AuthRepository implements AuthRepositoryInterface {
     constructor(
-        @InjectRepository(UserCredentialEntity)
-        private readonly credentialRepository: Repository<UserCredentialEntity>,
+        @InjectRepository(AuthCredentialEntity)
+        private readonly credentialRepository: Repository<AuthCredentialEntity>,
     ){}
 
-    async findCredentialByEmail(email: string): Promise<UserCredentialEntity | null>{
+    async findCredentialByEmail(email: string): Promise<AuthCredentialEntity | null>{
         return this.credentialRepository.findOne({where: {email}})
     }
 
-    async createCredential(userCredential: UserCredentialEntity): Promise<UserCredentialEntity>{
-        return this.credentialRepository.save(userCredential)
+    async createCredential(authCredential: AuthCredentialEntity): Promise<AuthCredentialEntity>{
+        return this.credentialRepository.save(authCredential)
     }
 
-    async updateCredential(userCredential: UserCredentialEntity): Promise<UserCredentialEntity>{
-        return this.credentialRepository.save(userCredential)
+    async updateCredential(authCredential: AuthCredentialEntity): Promise<AuthCredentialEntity>{
+        return this.credentialRepository.save(authCredential)
     }
 
-    async deleteCredential(userCredential: UserCredentialEntity): Promise<UserCredentialEntity>{
-        return this.credentialRepository.remove(userCredential)
+    async deleteCredential(authCredential: AuthCredentialEntity): Promise<AuthCredentialEntity>{
+        return this.credentialRepository.remove(authCredential)
     }
 }

@@ -6,6 +6,9 @@ import { UsersModule } from './context/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
+import { TrackingModule } from './context/tracking/tracking.module';
+import { StatsModule } from './context/stats/stats.module';
+import { HabitsModule } from './context/habits/habits.module';
 
 @Module({
   imports: [
@@ -40,6 +43,9 @@ import { join } from 'path';
 
     AuthModule,
     UsersModule,
+    HabitsModule,
+    StatsModule,
+    TrackingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

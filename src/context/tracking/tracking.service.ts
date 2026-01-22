@@ -1,51 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackingDTO } from './dto/create-tracking.dto';
 import { UpdateTrackingDTO } from './dto/update-tracking.dto';
-
-interface Tracking {
-  id: string;
-  habitId: string;
-  date: string;
-  status: string;
-}
+import { TrackingRepositoryInterface } from './tracking.repository.interface';
+import { TrackingEntity } from './entities/tracking.entity';
 
 @Injectable()
 export class TrackingService {
-  private trackings: Tracking[] = [];
-  
-  create(createTrackingDto: CreateTrackingDTO) {
-    const tracking: Tracking = { id: Date.now().toString(), ...createTrackingDto };
-    this.trackings.push(tracking);
+  constructor(
+    private readonly trackingRepository: TrackingRepositoryInterface,
+  ) {}
+
+  async create(createTrackingDto: CreateTrackingDTO) {
+    const tracking = new TrackingEntity();
+    tracking.habitId = createTrackingDto.habitId;
+    tracking.status = createTrackingDto.status;
+    tracking.date = new Date(createTrackingDto.date);
+
+    return this.trackingRepository.create(tracking);
+  }
+
+  async findAll() {
+    return this.trackingRepository.findAll();
+  }
+
+  async findOne(id: string) {
+    const tracking = await this.trackingRepository.findOne(id);
+    if (!tracking) {
+      throw new NotFoundException(`Tracking with ID ${id} not found`);
+    }
     return tracking;
   }
 
-  findAll() {
-    return this.trackings;
-  }
-
-  findOne(id: string) {
-    return this.trackings.find((tracking) => tracking.id === id);
-  }
-
-  update(id: string, updateTrackingDto: UpdateTrackingDTO) {
-    const trackingIndex = this.trackings.findIndex((tracking) => tracking.id === id);
-    if (trackingIndex > -1) {
-      this.trackings[trackingIndex] = {
-        ...this.trackings[trackingIndex],
-        ...updateTrackingDto,
-      };
-      return this.trackings[trackingIndex];
+  async update(id: string, updateTrackingDto: UpdateTrackingDTO) {
+    const tracking = await this.trackingRepository.findOne(id);
+    if (!tracking) {
+      throw new NotFoundException(`Tracking with ID ${id} not found`);
     }
-    return null;
+
+    const updatedTracking = { ...tracking, ...updateTrackingDto };
+    // Conversion de date si présente dans le DTO
+    if (updateTrackingDto.date) {
+      updatedTracking.date = new Date(updateTrackingDto.date);
+    }
+
+    return this.trackingRepository.update(updatedTracking as TrackingEntity);
   }
 
-  remove(id: string) {
-    const trackingIndex = this.trackings.findIndex((tracking) => tracking.id === id);
-    if (trackingIndex > -1) {
-      const deletedTracking = this.trackings[trackingIndex];
-      this.trackings.splice(trackingIndex, 1);
-      return deletedTracking;
+  async remove(id: string) {
+    const tracking = await this.trackingRepository.findOne(id);
+    if (!tracking) {
+      throw new NotFoundException(`Tracking with ID ${id} not found`);
     }
-    return null;
+    return this.trackingRepository.remove(tracking);
   }
 }

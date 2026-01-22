@@ -1,52 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateHabitDTO } from './dto/create-habit.dto';
 import { UpdateHabitDTO } from './dto/update-habit.dto';
-
-interface Habit {
-  id: string;
-  name: string;
-  description: string;
-}
-
+import { HabitsRepositoryInterface } from './habits.repository.interface';
+import { HabitEntity } from './entities/habit.entity';
 @Injectable()
 export class HabitsService {
-  private habits: Habit[] = [];
-  
-  create(createHabitDto: CreateHabitDTO) {
-    const habit: Habit = { id: Date.now().toString(), ...createHabitDto };
-    this.habits.push(habit);
+  constructor(private readonly habitsRepository: HabitsRepositoryInterface) {}
+
+  async create(CreateHabitDTO: CreateHabitDTO) {
+    const habit = new HabitEntity();
+    habit.name = CreateHabitDTO.name;
+    habit.description = CreateHabitDTO.description;
+
+    habit.userId = '00000000-0000-0000-0000-000000000000';
+
+    return this.habitsRepository.create(habit);
+  }
+
+  async findAll() {
+    return this.habitsRepository.findAll();
+  }
+
+  async findOne(id: string) {
+    const habit = await this.habitsRepository.findOne(id);
+    if (!habit) {
+      throw new NotFoundException(`L'habitude recherché n'a pas été trouvé`);
+    }
     return habit;
   }
 
-  findAll() {
-    return this.habits;
-  }
-
-  findOne(id: string) {
-    return this.habits.find((habit) => habit.id === id);
-  }
-
-  update(id: string, updateHabitDto: UpdateHabitDTO) {
-    const habitIndex = this.habits.findIndex((habit) => habit.id === id);
-    if (habitIndex > -1) {
-      const currentHabit = this.habits[habitIndex];
-      const updatedHabit = {
-        ...currentHabit,
-        ...updateHabitDto,
-      };
-      this.habits[habitIndex] = updatedHabit;
-      return updatedHabit;
+  async update(id: string, updateHabitDTO: UpdateHabitDTO) {
+    const habit = await this.habitsRepository.findOne(id);
+    if (!habit) {
+      throw new NotFoundException(`L'habitude recherché n'a pas été trouvé`);
     }
-    return null;
+    const updateHabitEntity = { ...habit, ...updateHabitDTO } as HabitEntity;
+    return this.habitsRepository.update(updateHabitEntity);
   }
 
-  remove(id: string) {
-    const habitIndex = this.habits.findIndex((habit) => habit.id === id);
-    if (habitIndex > -1) {
-      const deletedHabit = this.habits[habitIndex];
-      this.habits.splice(habitIndex, 1);
-      return deletedHabit;
+  async remove(id: string) {
+    const habit = await this.habitsRepository.findOne(id);
+    if (!habit) {
+      throw new NotFoundException(`L'habitude recherché n'a pas été trouvé`);
     }
-    return null;
+    return habit;
   }
 }

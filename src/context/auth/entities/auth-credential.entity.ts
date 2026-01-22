@@ -7,8 +7,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('user_credentials')
-export class UserCredentialEntity {
+@Entity('auth_credentials')
+export class AuthCredentialEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

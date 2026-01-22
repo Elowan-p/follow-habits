@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { AuthRepositoryInterface } from '../auth.repository.interface';
+import { AuthRepositoryInterface } from './auth.repository.interface';
 import { loginDTO } from './dto/login.dto';
 import { registerDTO } from './dto/register.dto';
-import { UserCredentialEntity } from './entities/user-credential.entity';
+import { AuthCredentialEntity } from './entities/auth-credential.entity';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +12,7 @@ export class AuthService {
   ) {}
 
   async register(body: registerDTO) {
-    const user = new UserCredentialEntity();
+    const user = new AuthCredentialEntity();
     user.email = body.email;
     user.passwordHashed = body.password;
     return this.authRepository.createCredential(user);
