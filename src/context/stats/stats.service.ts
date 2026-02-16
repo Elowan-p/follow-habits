@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HabitsRepositoryInterface } from '../habits/habits.repository.interface';
 import { TrackingRepositoryInterface } from '../tracking/tracking.repository.interface';
 
-import { Injectable } from '@nestjs/common';
+@Injectable()
 export class StatsService {
   constructor(
     private readonly habitsRepository: HabitsRepositoryInterface,
