@@ -15,9 +15,19 @@ import { plainToInstance } from 'class-transformer';
 import { FindAllPresenter } from './presenter/findAll.presenter';
 import { FindOnePresenter } from './presenter/findOne.presenter';
 import { UpdateUserDTO } from './dto/update-user.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 
 @ApiTags('Users')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

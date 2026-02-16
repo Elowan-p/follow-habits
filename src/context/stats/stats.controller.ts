@@ -2,8 +2,18 @@ import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { StatsPresenter } from './presenter/stats.presenter';
 import { plainToInstance } from 'class-transformer';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
+
 @ApiTags('Stats')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('stats')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}

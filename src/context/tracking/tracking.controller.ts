@@ -14,9 +14,19 @@ import { CreateTrackingDTO } from './dto/create-tracking.dto';
 import { UpdateTrackingDTO } from './dto/update-tracking.dto';
 import { TrackingPresenter } from './presenter/tracking.presenter';
 import { plainToInstance } from 'class-transformer';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @ApiTags('Tracking')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('tracking')
 export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
