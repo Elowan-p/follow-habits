@@ -8,13 +8,12 @@ import { HabitsError } from './error/habits.error';
 export class HabitsService {
   constructor(private readonly habitsRepository: HabitsRepositoryInterface) {}
 
-  async create(CreateHabitDTO: CreateHabitDTO) {
+  async create(CreateHabitDTO: CreateHabitDTO, userId: string) {
     const habit = new HabitEntity();
     habit.name = CreateHabitDTO.name;
     habit.description = CreateHabitDTO.description;
 
-    // TODO: Get real user from request
-    habit.user = { id: '00000000-0000-0000-0000-000000000000' } as any;
+    habit.user = { id: userId } as any;
 
     return this.habitsRepository.create(habit);
   }

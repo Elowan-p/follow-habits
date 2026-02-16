@@ -38,7 +38,7 @@ describe('HabitsService', () => {
       const habit = { id: '1', ...dto, user: { id: 'uuid' } };
       mockHabitsRepository.create.mockResolvedValue(habit);
 
-      const result = await service.create(dto);
+      const result = await service.create(dto, 'uuid');
 
       expect(result).toEqual(habit);
       expect(mockHabitsRepository.create).toHaveBeenCalled();

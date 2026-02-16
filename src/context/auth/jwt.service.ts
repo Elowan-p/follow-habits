@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthToken, IJwtService, JwtPayload } from './jwt.ports';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CustomJwtService implements IJwtService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   signToken(payload: JwtPayload): AuthToken {
     const accessToken = this.jwtService.sign(payload);
@@ -17,14 +21,14 @@ export class CustomJwtService implements IJwtService {
 
   signRefreshToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload, {
-      secret: 'refreshSecretKey', // TODO: Move to env
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: '7d',
     });
   }
 
   verifyToken(token: string): JwtPayload {
     return this.jwtService.verify(token, {
-      secret: 'refreshSecretKey',
-    }) as JwtPayload;
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
   }
 }

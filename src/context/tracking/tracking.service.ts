@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { TrackingError } from './error/tracking.error';
 import { CreateTrackingDTO } from './dto/create-tracking.dto';
 import { UpdateTrackingDTO } from './dto/update-tracking.dto';
 import { TrackingRepositoryInterface } from './tracking.repository.interface';
@@ -26,7 +27,11 @@ export class TrackingService {
   async findOne(id: string) {
     const tracking = await this.trackingRepository.findOne(id);
     if (!tracking) {
-      throw new NotFoundException(`Tracking with ID ${id} not found`);
+      throw new TrackingError({
+        code: 'TRACKING_NOT_FOUND',
+        message: `Tracking with ID ${id} not found`,
+        statusCode: 404,
+      });
     }
     return tracking;
   }
@@ -34,7 +39,11 @@ export class TrackingService {
   async update(id: string, updateTrackingDto: UpdateTrackingDTO) {
     const tracking = await this.trackingRepository.findOne(id);
     if (!tracking) {
-      throw new NotFoundException(`Tracking with ID ${id} not found`);
+      throw new TrackingError({
+        code: 'TRACKING_NOT_FOUND',
+        message: `Tracking with ID ${id} not found`,
+        statusCode: 404,
+      });
     }
 
     const updatedTracking = { ...tracking, ...updateTrackingDto };
@@ -49,7 +58,11 @@ export class TrackingService {
   async remove(id: string) {
     const tracking = await this.trackingRepository.findOne(id);
     if (!tracking) {
-      throw new NotFoundException(`Tracking with ID ${id} not found`);
+      throw new TrackingError({
+        code: 'TRACKING_NOT_FOUND',
+        message: `Tracking with ID ${id} not found`,
+        statusCode: 404,
+      });
     }
     return this.trackingRepository.remove(tracking);
   }

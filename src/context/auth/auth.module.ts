@@ -11,22 +11,31 @@ import { CustomJwtService } from './jwt.service';
 import { IJwtService } from './jwt.ports';
 import { JwtController } from './jwt.controller';
 import { UsersModule } from '../users/users.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AuthCredentialEntity]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: 'secretKey',
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1d' },
+      }),
     }),
     UsersModule,
+    ConfigModule,
   ],
   controllers: [AuthController, JwtController],
   providers: [
     AuthService,
+    JwtStrategy,
     { provide: AuthRepositoryInterface, useClass: AuthRepository },
     { provide: IJwtService, useClass: CustomJwtService },
   ],
+  exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}

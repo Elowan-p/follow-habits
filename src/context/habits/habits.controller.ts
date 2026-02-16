@@ -8,15 +8,26 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { HabitsService } from './habits.service';
 import { CreateHabitDTO } from './dto/create-habit.dto';
 import { UpdateHabitDTO } from './dto/update-habit.dto';
 import { HabitPresenter } from './presenter/habit.presenter';
 import { plainToInstance } from 'class-transformer';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 
 @ApiTags('Habits')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('habits')
 export class HabitsController {
   constructor(private readonly habitsService: HabitsService) {}
@@ -25,8 +36,8 @@ export class HabitsController {
   @ApiOperation({ summary: 'Create habit' })
   @ApiResponse({ status: 201, type: HabitPresenter })
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createHabitDto: CreateHabitDTO) {
-    const habit = this.habitsService.create(createHabitDto);
+  create(@Body() createHabitDto: CreateHabitDTO, @Request() req: any) {
+    const habit = this.habitsService.create(createHabitDto, req.user.userId);
     return plainToInstance(HabitPresenter, habit);
   }
 
