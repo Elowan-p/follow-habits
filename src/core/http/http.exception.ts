@@ -4,7 +4,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable prettier/prettier */
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { DomainError } from '../error/domain.error';
 
 type ApiErrorBody = {
@@ -27,16 +34,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const method = request?.method ?? 'UNKNOWN';
     const path = request?.url ?? request?.originalUrl ?? 'UNKNOWN';
 
-    // 1) Domain errors (DDD)
     if (exception instanceof DomainError) {
       const payload: ApiErrorBody = {
         code: exception.code,
         message: exception.message,
-        fields: exception.fields,
+        fields: exception.field as any,
         details: exception.details,
       };
 
-      this.log(exception.statusCode, method, path, payload.code, payload.message, exception);
+      this.log(
+        exception.statusCode,
+        method,
+        path,
+        payload.code,
+        payload.message,
+        exception,
+      );
 
       return response.status(exception.statusCode).send(payload);
     }
@@ -54,7 +67,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
         details: normalized.details,
       };
 
-      this.log(statusCode, method, path, payload.code, payload.message, exception);
+      this.log(
+        statusCode,
+        method,
+        path,
+        payload.code,
+        payload.message,
+        exception,
+      );
 
       return response.status(statusCode).send(payload);
     }
@@ -68,15 +88,27 @@ export class HttpExceptionFilter implements ExceptionFilter {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    this.log(statusCode, method, path, payload.code, payload.message, exception);
+    this.log(
+      statusCode,
+      method,
+      path,
+      payload.code,
+      payload.message,
+      exception,
+    );
 
     return response.status(statusCode).send(payload);
   }
 
-  private normalizeHttpException(raw: any, statusCode: number): { code: string; message: string; fields?: any; details?: any } {
+  private normalizeHttpException(
+    raw: any,
+    statusCode: number,
+  ): { code: string; message: string; fields?: any; details?: any } {
     if (raw && typeof raw === 'object') {
       const code = raw.code ?? this.defaultCodeForStatus(statusCode);
-      const message = Array.isArray(raw.message) ? raw.message.join(', ') : String(raw.message ?? 'Request failed');
+      const message = Array.isArray(raw.message)
+        ? raw.message.join(', ')
+        : String(raw.message ?? 'Request failed');
 
       return {
         code,
@@ -110,7 +142,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
     return 'HTTP_ERROR';
   }
 
-  private log(statusCode: number, method: string, path: string, code: string, message: string, exception: unknown) {
+  private log(
+    statusCode: number,
+    method: string,
+    path: string,
+    code: string,
+    message: string,
+    exception: unknown,
+  ) {
     const line = `[${method}] ${path} -> ${statusCode} ${code}: ${message}`;
 
     if (statusCode >= 500) {

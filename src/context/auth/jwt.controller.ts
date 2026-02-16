@@ -1,4 +1,12 @@
-import { Controller, Get, UseGuards, Request, Post, Body, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Request,
+  Post,
+  Body,
+  Inject,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 

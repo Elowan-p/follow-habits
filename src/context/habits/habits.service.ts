@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateHabitDTO } from './dto/create-habit.dto';
 import { UpdateHabitDTO } from './dto/update-habit.dto';
 import { HabitsRepositoryInterface } from './habits.repository.interface';
 import { HabitEntity } from './entities/habit.entity';
+import { HabitsError } from './error/habits.error';
 @Injectable()
 export class HabitsService {
   constructor(private readonly habitsRepository: HabitsRepositoryInterface) {}
@@ -25,7 +26,11 @@ export class HabitsService {
   async findOne(id: string) {
     const habit = await this.habitsRepository.findOne(id);
     if (!habit) {
-      throw new NotFoundException(`L'habitude recherché n'a pas été trouvé`);
+      throw new HabitsError({
+        code: 'HABIT_NOT_FOUND',
+        message: `L'habitude recherché n'a pas été trouvé`,
+        statusCode: 404,
+      });
     }
     return habit;
   }
@@ -33,7 +38,11 @@ export class HabitsService {
   async update(id: string, updateHabitDTO: UpdateHabitDTO) {
     const habit = await this.habitsRepository.findOne(id);
     if (!habit) {
-      throw new NotFoundException(`L'habitude recherché n'a pas été trouvé`);
+      throw new HabitsError({
+        code: 'HABIT_NOT_FOUND',
+        message: `L'habitude recherché n'a pas été trouvé`,
+        statusCode: 404,
+      });
     }
     const updateHabitEntity = { ...habit, ...updateHabitDTO } as HabitEntity;
     return this.habitsRepository.update(updateHabitEntity);
@@ -42,7 +51,11 @@ export class HabitsService {
   async remove(id: string) {
     const habit = await this.habitsRepository.findOne(id);
     if (!habit) {
-      throw new NotFoundException(`L'habitude recherché n'a pas été trouvé`);
+      throw new HabitsError({
+        code: 'HABIT_NOT_FOUND',
+        message: `L'habitude recherché n'a pas été trouvé`,
+        statusCode: 404,
+      });
     }
     return habit;
   }

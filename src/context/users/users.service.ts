@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as usersType from './dto/users.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { UsersRepositoryInterface } from './users.repository.interface';
+import { UsersError } from './error/users.error';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepositoryInterface) {}
 
-  async findAll(query: usersType.findAllDTO) {
+  async findAll(_query: usersType.findAllDTO) {
     const users = await this.usersRepository.findAll();
     return {
       message: 'Tous les utilisateurs',
@@ -19,9 +19,11 @@ export class UsersService {
   async findOne(params: usersType.findOneDTO) {
     const user = await this.usersRepository.findOneById(params.id);
     if (!user) {
-      throw new NotFoundException(
-        `L'utilisateur reccherché n'a pas été trouvé`,
-      );
+      throw new UsersError({
+        code: 'USER_NOT_FOUND',
+        message: `L'utilisateur recherché n'a pas été trouvé`,
+        statusCode: 404,
+      });
     }
     return {
       message: 'Un utilisateur',
@@ -32,9 +34,11 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDTO) {
     const user = await this.usersRepository.findOneById(id);
     if (!user) {
-      throw new NotFoundException(
-        `L'utilisateur reccherché n'a pas été trouvé`,
-      );
+      throw new UsersError({
+        code: 'USER_NOT_FOUND',
+        message: `L'utilisateur recherché n'a pas été trouvé`,
+        statusCode: 404,
+      });
     }
 
     const userToUpdate = { ...user, ...updateUserDto };
@@ -50,9 +54,11 @@ export class UsersService {
   async remove(id: string) {
     const user = await this.usersRepository.findOneById(id);
     if (!user) {
-      throw new NotFoundException(
-        `L'utilisateur reccherché n'a pas été trouvé`,
-      );
+      throw new UsersError({
+        code: 'USER_NOT_FOUND',
+        message: `L'utilisateur recherché n'a pas été trouvé`,
+        statusCode: 404,
+      });
     }
 
     await this.usersRepository.remove(user);

@@ -12,7 +12,9 @@ export class TrackingEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => HabitEntity, (habit) => habit.trackings, { onDelete: 'CASCADE' })
+  @ManyToOne(() => HabitEntity, (habit) => habit.trackings, {
+    onDelete: 'CASCADE',
+  })
   habit: HabitEntity;
 
   @Column({ type: 'datetime' })

@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthRepositoryInterface } from './auth.repository.interface';
 import { loginDTO } from './dto/login.dto';
@@ -8,6 +8,7 @@ import { IJwtService } from './jwt.ports';
 
 import { UsersRepositoryInterface } from '../users/users.repository.interface';
 import { UserEntity } from '../users/entities/user.entity';
+import { AuthError } from './error/auth.error';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,8 @@ export class AuthService {
     const authCredential = new AuthCredentialEntity();
     authCredential.email = body.email;
     authCredential.passwordHashed = await bcrypt.hash(body.password, 10);
-    const savedAuth = await this.authRepository.createCredential(authCredential);
+    const savedAuth =
+      await this.authRepository.createCredential(authCredential);
 
     // 2. Create User Profile
     const user = new UserEntity();
@@ -32,19 +34,27 @@ export class AuthService {
     user.name = body.username;
     user.auth = savedAuth;
     await this.usersRepository.create(user);
-    
+
     return savedAuth;
   }
 
   async login(body: loginDTO) {
     const user = await this.authRepository.findCredentialByEmail(body.email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AuthError({
+        code: 'AUTH_INVALID_CREDENTIALS',
+        message: 'Invalid credentials',
+        statusCode: 401,
+      });
     }
 
     const isMatch = await bcrypt.compare(body.password, user.passwordHashed);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AuthError({
+        code: 'AUTH_INVALID_CREDENTIALS',
+        message: 'Invalid credentials',
+        statusCode: 401,
+      });
     }
 
     const payload = { email: user.email, sub: user.id };
@@ -59,10 +69,16 @@ export class AuthService {
   async refresh(refreshToken: string) {
     try {
       const payload = this.jwtService.verifyToken(refreshToken);
-      const user = await this.authRepository.findCredentialByEmail(payload.email);
+      const user = await this.authRepository.findCredentialByEmail(
+        payload.email,
+      );
 
       if (!user || !user.refreshTokenHashed) {
-        throw new UnauthorizedException('Access denied');
+        throw new AuthError({
+          code: 'AUTH_ACCESS_DENIED',
+          message: 'Access denied',
+          statusCode: 401,
+        });
       }
 
       const isRefreshTokenMatching = await bcrypt.compare(
@@ -71,7 +87,11 @@ export class AuthService {
       );
 
       if (!isRefreshTokenMatching) {
-        throw new UnauthorizedException('Access denied');
+        throw new AuthError({
+          code: 'AUTH_ACCESS_DENIED',
+          message: 'Access denied',
+          statusCode: 401,
+        });
       }
 
       const newPayload = { email: user.email, sub: user.id };
@@ -82,7 +102,11 @@ export class AuthService {
 
       return tokens;
     } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new AuthError({
+        code: 'AUTH_INVALID_REFRESH_TOKEN',
+        message: 'Invalid or expired refresh token',
+        statusCode: 401,
+      });
     }
   }
 }

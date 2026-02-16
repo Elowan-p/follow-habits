@@ -2,13 +2,13 @@
 import { DomainError } from 'core/error/domain.error';
 
 export class AuthError extends DomainError {
-    constructor(params: {
-        code: string;
-        statusCode: number;
-        message: string;
-        field?: Record<string, unknown>;
-        details?: Record<string, unknown>;
-    }) {
-        super(params);
-    }
+  constructor(params: {
+    code: string;
+    statusCode: number;
+    message: string;
+    field?: Record<string, unknown>;
+    details?: Record<string, unknown>;
+  }) {
+    super(params);
+  }
 }

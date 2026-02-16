@@ -23,6 +23,8 @@ export class CustomJwtService implements IJwtService {
   }
 
   verifyToken(token: string): JwtPayload {
-    return this.jwtService.verify(token, { secret: 'refreshSecretKey' }) as JwtPayload;
+    return this.jwtService.verify(token, {
+      secret: 'refreshSecretKey',
+    }) as JwtPayload;
   }
 }

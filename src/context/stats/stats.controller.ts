@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { StatsPresenter } from './presenter/stats.presenter';
 import { plainToInstance } from 'class-transformer';

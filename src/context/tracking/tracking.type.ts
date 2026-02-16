@@ -7,5 +7,8 @@ export type Tracking = {
   updatedAt: Date;
 };
 
-export type CreateTrackingDTO = Omit<Tracking, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreateTrackingDTO = Omit<
+  Tracking,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 export type UpdateTrackingDTO = Partial<CreateTrackingDTO>;
