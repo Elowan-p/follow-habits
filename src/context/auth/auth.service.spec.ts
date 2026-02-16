@@ -6,6 +6,8 @@ import { UsersRepositoryInterface } from '../users/users.repository.interface';
 import { AuthError } from './error/auth.error';
 import * as bcrypt from 'bcrypt';
 
+import { EVENT_BUS } from 'core/event/event-bus.port';
+
 jest.mock('bcrypt');
 
 describe('AuthService', () => {
@@ -26,6 +28,10 @@ describe('AuthService', () => {
     create: jest.fn(),
   };
 
+  const mockEventBus = {
+    publish: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -33,6 +39,7 @@ describe('AuthService', () => {
         { provide: AuthRepositoryInterface, useValue: mockAuthRepository },
         { provide: IJwtService, useValue: mockJwtService },
         { provide: UsersRepositoryInterface, useValue: mockUsersRepository },
+        { provide: EVENT_BUS, useValue: mockEventBus },
       ],
     }).compile();
 

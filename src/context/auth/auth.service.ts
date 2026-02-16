@@ -9,6 +9,9 @@ import { IJwtService } from './jwt.ports';
 import { UsersRepositoryInterface } from '../users/users.repository.interface';
 import { UserEntity } from '../users/entities/user.entity';
 import { AuthError } from './error/auth.error';
+import { EVENT_BUS } from '../../core/event/event-bus.port';
+import type { EventBusPort } from '../../core/event/event-bus.port';
+import { UserRegisteredEvent } from './event/user-registered.event';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +21,8 @@ export class AuthService {
     @Inject(IJwtService)
     private readonly jwtService: IJwtService,
     private readonly usersRepository: UsersRepositoryInterface,
+    @Inject(EVENT_BUS)
+    private readonly eventBus: EventBusPort,
   ) {}
 
   async register(body: registerDTO) {
@@ -27,13 +32,16 @@ export class AuthService {
     authCredential.passwordHashed = await bcrypt.hash(body.password, 10);
     const savedAuth =
       await this.authRepository.createCredential(authCredential);
-
     // 2. Create User Profile
     const user = new UserEntity();
     user.email = body.email;
     user.name = body.username;
     user.auth = savedAuth;
     await this.usersRepository.create(user);
+
+    await this.eventBus.publish(
+      UserRegisteredEvent.create({ email: body.email, id: savedAuth.id }),
+    );
 
     return savedAuth;
   }

@@ -9,6 +9,8 @@ import { join } from 'path';
 import { TrackingModule } from './context/tracking/tracking.module';
 import { StatsModule } from './context/stats/stats.module';
 import { HabitsModule } from './context/habits/habits.module';
+import { EventModule } from './core/event/event.module';
+import { NotificationModule } from './context/notification/notification.module';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { HabitsModule } from './context/habits/habits.module';
     HabitsModule,
     StatsModule,
     TrackingModule,
+    EventModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

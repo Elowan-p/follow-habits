@@ -13,6 +13,8 @@ import { JwtController } from './jwt.controller';
 import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { EventModule } from '../../core/event/event.module';
+import { SendUserRegisteredHandler } from './handlers/send-user-registered';
 
 @Module({
   imports: [
@@ -28,11 +30,13 @@ import { JwtStrategy } from './jwt.strategy';
     }),
     UsersModule,
     ConfigModule,
+    EventModule,
   ],
   controllers: [AuthController, JwtController],
   providers: [
     AuthService,
     JwtStrategy,
+    SendUserRegisteredHandler,
     { provide: AuthRepositoryInterface, useClass: AuthRepository },
     { provide: IJwtService, useClass: CustomJwtService },
   ],
