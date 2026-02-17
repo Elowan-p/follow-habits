@@ -9,7 +9,11 @@ async function bootstrap() {
 
   console.log('Publishing UserRegisteredEvent...');
   await eventBus.publish(
-    UserRegisteredEvent.create({ email: 'test-user@example.com', id: '123' }),
+    UserRegisteredEvent.create({
+      email: 'test-user@example.com',
+      id: '123',
+      username: 'Toto',
+    }),
   );
 
   // Wait a bit for async handlers

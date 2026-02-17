@@ -40,7 +40,11 @@ export class AuthService {
     await this.usersRepository.create(user);
 
     await this.eventBus.publish(
-      UserRegisteredEvent.create({ email: body.email, id: savedAuth.id }),
+      UserRegisteredEvent.create({
+        email: body.email,
+        id: savedAuth.id,
+        username: body.username,
+      }),
     );
 
     return savedAuth;

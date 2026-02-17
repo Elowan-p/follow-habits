@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import { EmailServiceInterface, SendEmailDto } from './email.service.interface';
 //Regarder en ligne de commande pour voir l'email reçu il y aura un lien ethereal pour voir le corps du mail et ce qui est dit dedans
 @Injectable()
-export class EmailService {
+export class EmailService implements EmailServiceInterface {
   private transporter: nodemailer.Transporter;
+  private initPromise: Promise<void>;
 
   constructor(private readonly configService: ConfigService) {
-    this.initTransporter();
+    this.initPromise = this.initTransporter();
   }
 
   private async initTransporter() {
@@ -36,20 +38,24 @@ export class EmailService {
     });
   }
 
-  async sendUserWelcome(email: string) {
+  async send(payload: SendEmailDto): Promise<void> {
+    await this.initPromise;
+    
     if (!this.transporter) {
-      await this.initTransporter();
+       // Should not happen if initPromise resolves correctly, but safe guard
+       await this.initTransporter();
     }
 
-    const from = this.configService.get<string>('MAIL_FROM');
+    const from =
+      this.configService.get<string>('MAIL_FROM') ||
+      '"Follow Habits" <noreply@followhabits.com>';
     const info = await this.transporter.sendMail({
       from,
-      to: email,
-      subject: 'Welcome to Follow Habits!',
-      text: 'Welcome to Follow Habits! We are glad to have you with us.',
-      html: '<b>Welcome to Follow Habits!</b><br>We are glad to have you with us.',
+      to: payload.to,
+      subject: payload.subject,
+      html: payload.html,
     });
-    console.log(`[EmailService] Welcome email sent to ${email}`);
+    console.log(`[EmailService] Email sent to ${payload.to}`);
     console.log(
       `[EmailService] Preview URL: ${nodemailer.getTestMessageUrl(info)}`,
     );

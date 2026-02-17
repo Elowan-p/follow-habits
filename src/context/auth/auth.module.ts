@@ -15,6 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 import { EventModule } from '../../core/event/event.module';
 import { SendUserRegisteredHandler } from './handlers/send-user-registered';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SendUserRegisteredHandler } from './handlers/send-user-registered';
     UsersModule,
     ConfigModule,
     EventModule,
+    NotificationModule,
   ],
   controllers: [AuthController, JwtController],
   providers: [
