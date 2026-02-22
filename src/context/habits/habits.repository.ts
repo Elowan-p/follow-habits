@@ -15,7 +15,10 @@ export class HabitsRepository implements HabitsRepositoryInterface {
     return this.repository.save(habit);
   }
 
-  async findAll(): Promise<HabitEntity[]> {
+  async findAll(category?: any): Promise<HabitEntity[]> {
+    if (category) {
+      return this.repository.find({ where: { category } });
+    }
     return this.repository.find();
   }
 

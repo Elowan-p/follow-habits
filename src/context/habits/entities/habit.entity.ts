@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
 import { TrackingEntity } from '../../tracking/entities/tracking.entity';
+import { HabitCategory } from '../enums/habit-category.enum';
 
 @Entity('habits')
 export class HabitEntity {
@@ -27,6 +28,13 @@ export class HabitEntity {
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  @Column({
+    type: 'enum',
+    enum: HabitCategory,
+    default: HabitCategory.OTHER,
+  })
+  category: HabitCategory;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

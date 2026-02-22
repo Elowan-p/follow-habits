@@ -5,9 +5,14 @@ import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from './jwt.ports';
 import { AuthError } from './error/auth.error';
 
+import { UsersRepositoryInterface } from '../users/users.repository.interface';
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(configService: ConfigService) {
+  constructor(
+    configService: ConfigService,
+    private readonly usersRepository: UsersRepositoryInterface,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -23,6 +28,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         statusCode: 401,
       });
     }
-    return { userId: payload.sub, email: payload.email };
+
+    const user = await this.usersRepository.findOneByAuthId(payload.sub);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
   }
 }

@@ -12,6 +12,7 @@ import { AuthError } from './error/auth.error';
 import { EVENT_BUS } from '../../core/event/event-bus.port';
 import type { EventBusPort } from '../../core/event/event-bus.port';
 import { UserRegisteredEvent } from './event/user-registered.event';
+import { ROLE_USER } from '../../core/rights/roles';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +38,7 @@ export class AuthService {
     user.email = body.email;
     user.name = body.username;
     user.auth = savedAuth;
+    user.rights = ROLE_USER;
     await this.usersRepository.create(user);
 
     await this.eventBus.publish(

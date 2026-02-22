@@ -40,10 +40,9 @@ export class EmailService implements EmailServiceInterface {
 
   async send(payload: SendEmailDto): Promise<void> {
     await this.initPromise;
-    
     if (!this.transporter) {
-       // Should not happen if initPromise resolves correctly, but safe guard
-       await this.initTransporter();
+      // Should not happen if initPromise resolves correctly, but safe guard
+      await this.initTransporter();
     }
 
     const from =

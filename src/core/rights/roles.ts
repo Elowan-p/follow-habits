@@ -1,0 +1,32 @@
+import {
+  HABITS_CREATE,
+  HABITS_DELETE,
+  HABITS_READ,
+  HABITS_UPDATE,
+  STATS_READ,
+  SYSTEM_MANAGE,
+  TRACKING_CREATE,
+  TRACKING_DELETE,
+  TRACKING_READ,
+  TRACKING_UPDATE,
+  USER_DELETE,
+  USER_READ,
+  USER_UPDATE,
+} from './rights.constants';
+
+export const ROLE_USER =
+  HABITS_CREATE |
+  HABITS_READ |
+  HABITS_UPDATE |
+  HABITS_DELETE |
+  STATS_READ |
+  TRACKING_CREATE |
+  TRACKING_READ |
+  TRACKING_UPDATE |
+  TRACKING_DELETE;
+
+export const ROLE_USER_VIP =
+  ROLE_USER | USER_READ | USER_UPDATE; // Example: VIP can maybe read/update their own profile more extensively? Or just a placeholder for now.
+
+export const ROLE_ADMIN =
+  ROLE_USER_VIP | USER_DELETE | SYSTEM_MANAGE | USER_READ | USER_UPDATE;

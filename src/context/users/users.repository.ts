@@ -19,6 +19,13 @@ export class UsersRepository implements UsersRepositoryInterface {
     return this.repository.findOne({ where: { id } });
   }
 
+  async findOneByAuthId(authId: string): Promise<UserEntity | null> {
+    return this.repository.findOne({
+      where: { auth: { id: authId } },
+      relations: ['auth'],
+    });
+  }
+
   async update(user: UserEntity): Promise<UserEntity> {
     return this.repository.save(user);
   }

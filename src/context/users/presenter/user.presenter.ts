@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserPresenter {
@@ -13,4 +13,13 @@ export class UserPresenter {
   @ApiProperty()
   @Expose()
   email: string;
+
+  @ApiProperty({
+    description: 'User rights mask (BigInt as string)',
+    example: '1',
+    type: String,
+  })
+  @Expose()
+  @Transform(({ value }) => String(value))
+  rights: bigint;
 }

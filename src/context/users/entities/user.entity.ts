@@ -11,8 +11,10 @@ import { AuthCredentialEntity } from '../../auth/entities/auth-credential.entity
 import { HabitEntity } from '../../habits/entities/habit.entity';
 import { StatEntity } from '../../stats/entities/stats.entity';
 
+import { RightsInterface } from '../../../core/rights/rights.interface';
+
 @Entity('users')
-export class UserEntity {
+export class UserEntity implements RightsInterface {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -28,10 +30,19 @@ export class UserEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
+  @Column({
+    type: 'bigint',
+    default: 0,
+    transformer: {
+      to: (value: bigint) => value,
+      from: (value: string) => BigInt(value),
+    },
+  })
+  rights: bigint;
+
   @OneToOne(() => AuthCredentialEntity, (auth) => auth.user)
   auth: AuthCredentialEntity;
 
-  // Placeholder for other relations to avoid errors before defining them
   @OneToMany(() => HabitEntity, (habit) => habit.user)
   habits: HabitEntity[];
 

@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { TrackingService } from './tracking.service';
 import { CreateTrackingDTO } from './dto/create-tracking.dto';
@@ -22,11 +23,18 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
-import { UseGuards } from '@nestjs/common';
+import { RightsGuard } from '../../core/rights/guards/rights.guard';
+import { RequireRights } from '../../core/rights/decorators/require-rights.decorator';
+import {
+  TRACKING_CREATE,
+  TRACKING_READ,
+  TRACKING_UPDATE,
+  TRACKING_DELETE,
+} from '../../core/rights/rights.constants';
 
 @ApiTags('Tracking')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RightsGuard)
 @Controller('tracking')
 export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
@@ -34,6 +42,7 @@ export class TrackingController {
   @Post()
   @ApiOperation({ summary: 'Create tracking' })
   @ApiResponse({ status: 201, type: TrackingPresenter })
+  @RequireRights(TRACKING_CREATE)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createTrackingDto: CreateTrackingDTO) {
     const tracking = this.trackingService.create(createTrackingDto);
@@ -43,6 +52,7 @@ export class TrackingController {
   @Get()
   @ApiOperation({ summary: 'Get all trackings' })
   @ApiResponse({ status: 200, type: [TrackingPresenter] })
+  @RequireRights(TRACKING_READ)
   @HttpCode(HttpStatus.OK)
   findAll() {
     const trackings = this.trackingService.findAll();
@@ -53,6 +63,7 @@ export class TrackingController {
   @ApiOperation({ summary: 'Get tracking by id' })
   @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: TrackingPresenter })
+  @RequireRights(TRACKING_READ)
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
     const tracking = this.trackingService.findOne(id);
@@ -63,6 +74,7 @@ export class TrackingController {
   @ApiOperation({ summary: 'Update tracking' })
   @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: TrackingPresenter })
+  @RequireRights(TRACKING_UPDATE)
   @HttpCode(HttpStatus.OK)
   update(
     @Param('id') id: string,
@@ -76,6 +88,7 @@ export class TrackingController {
   @ApiOperation({ summary: 'Delete tracking' })
   @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: TrackingPresenter })
+  @RequireRights(TRACKING_DELETE)
   @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {
     const tracking = this.trackingService.remove(id);

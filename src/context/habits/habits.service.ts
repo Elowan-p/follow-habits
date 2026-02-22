@@ -2,18 +2,36 @@ import { Injectable } from '@nestjs/common';
 import { CreateHabitDTO } from './dto/create-habit.dto';
 import { UpdateHabitDTO } from './dto/update-habit.dto';
 import { HabitsRepositoryInterface } from './habits.repository.interface';
+import { UsersRepositoryInterface } from '../users/users.repository.interface';
 import { HabitEntity } from './entities/habit.entity';
 import { HabitsError } from './error/habits.error';
+import { HabitCategory } from './enums/habit-category.enum';
 @Injectable()
 export class HabitsService {
-  constructor(private readonly habitsRepository: HabitsRepositoryInterface) {}
+  constructor(
+    private readonly habitsRepository: HabitsRepositoryInterface,
+    private readonly usersRepository: UsersRepositoryInterface,
+  ) {}
 
+  /**
+   * récupèrer l'entité user et la mettre dans HabitsUser
+   * save après création
+   */
   async create(CreateHabitDTO: CreateHabitDTO, userId: string) {
+    const user = await this.usersRepository.findOneById(userId);
+    if (!user) {
+      throw new HabitsError({
+        code: 'USER_NOT_FOUND',
+        message: 'User not found',
+        statusCode: 404,
+      });
+    }
+
     const habit = new HabitEntity();
     habit.name = CreateHabitDTO.name;
     habit.description = CreateHabitDTO.description;
-
-    habit.user = { id: userId } as any;
+    habit.category = CreateHabitDTO.category || HabitCategory.OTHER;
+    habit.user = user;
 
     return this.habitsRepository.create(habit);
   }

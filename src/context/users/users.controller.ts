@@ -24,10 +24,13 @@ import {
 } from '@nestjs/swagger';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
+import { RightsGuard } from '../../core/rights/guards/rights.guard';
+import { RequireRights } from '../../core/rights/decorators/require-rights.decorator';
+import { USER_READ } from '../../core/rights/rights.constants';
 
 @ApiTags('Users')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RightsGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -36,6 +39,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, type: FindAllPresenter })
   @HttpCode(HttpStatus.OK)
+  @RequireRights(USER_READ)
   findAll(@Query() query: usersType.findAllDTO) {
     const response = this.usersService.findAll(query);
     return plainToInstance(FindAllPresenter, response);
@@ -46,6 +50,7 @@ export class UsersController {
   @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: FindOnePresenter })
   @HttpCode(HttpStatus.OK)
+  @RequireRights(USER_READ)
   findOne(@Param('id') id: string) {
     const response = this.usersService.findOne({ id });
     return plainToInstance(FindOnePresenter, response);
