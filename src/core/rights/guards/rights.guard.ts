@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 import { Reflector } from '@nestjs/core';
 import { RIGHTS_KEY } from '../decorators/require-rights.decorator';
 import { RightsUtils } from '../rights.utils';
-import { UserEntity } from '../../../context/users/entities/user.entity';
+import { SYSTEM_MANAGE } from '../rights.constants';
 
 @Injectable()
 export class RightsGuard implements CanActivate {
@@ -23,6 +23,11 @@ export class RightsGuard implements CanActivate {
         throw new ForbiddenException('Insufficient rights: No user rights found');
     }
     const userRights = typeof user.rights === 'string' ? BigInt(user.rights) : BigInt(user.rights);
+
+    // SYSTEM_MANAGE (admin) bypasses all granular rights checks
+    if (RightsUtils.hasAll(userRights, SYSTEM_MANAGE)) {
+      return true;
+    }
 
     if (!RightsUtils.hasAll(userRights, requiredRights)) {
       throw new ForbiddenException('Insufficient rights');

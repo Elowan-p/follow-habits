@@ -13,10 +13,6 @@ export class HabitsService {
     private readonly usersRepository: UsersRepositoryInterface,
   ) {}
 
-  /**
-   * récupèrer l'entité user et la mettre dans HabitsUser
-   * save après création
-   */
   async create(CreateHabitDTO: CreateHabitDTO, userId: string) {
     const user = await this.usersRepository.findOneById(userId);
     if (!user) {

@@ -20,3 +20,9 @@ export const TRACKING_DELETE = 1n << 11n;
 
 // Admin Permissions (System level)
 export const SYSTEM_MANAGE = 1n << 60n; // High bit for admin stuff
+
+// Group Permissions
+export const GROUPS_CREATE = 1n << 12n;
+export const GROUPS_READ = 1n << 13n;
+export const GROUPS_UPDATE = 1n << 14n;
+export const GROUPS_DELETE = 1n << 15n;

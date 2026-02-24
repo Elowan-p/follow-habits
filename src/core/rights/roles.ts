@@ -12,6 +12,10 @@ import {
   USER_DELETE,
   USER_READ,
   USER_UPDATE,
+  GROUPS_CREATE,
+  GROUPS_READ,
+  GROUPS_UPDATE,
+  GROUPS_DELETE,
 } from './rights.constants';
 
 export const ROLE_USER =
@@ -23,7 +27,11 @@ export const ROLE_USER =
   TRACKING_CREATE |
   TRACKING_READ |
   TRACKING_UPDATE |
-  TRACKING_DELETE;
+  TRACKING_DELETE |
+  GROUPS_CREATE |
+  GROUPS_READ |
+  GROUPS_UPDATE |
+  GROUPS_DELETE;
 
 export const ROLE_USER_VIP =
   ROLE_USER | USER_READ | USER_UPDATE; // Example: VIP can maybe read/update their own profile more extensively? Or just a placeholder for now.

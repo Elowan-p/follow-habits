@@ -11,7 +11,7 @@ import { StatsModule } from './context/stats/stats.module';
 import { HabitsModule } from './context/habits/habits.module';
 import { EventModule } from './core/event/event.module';
 import { NotificationModule } from './context/notification/notification.module';
-
+import { GroupsModule } from './context/groups/groups.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,6 +50,7 @@ import { NotificationModule } from './context/notification/notification.module';
     TrackingModule,
     EventModule,
     NotificationModule,
+    GroupsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
