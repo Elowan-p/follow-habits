@@ -30,4 +30,74 @@ export class TrackingRepository implements TrackingRepositoryInterface {
   async remove(tracking: TrackingEntity): Promise<TrackingEntity> {
     return this.repository.remove(tracking);
   }
+
+  async getStats(
+    filters: {
+      userId?: string;
+      category?: string;
+    }
+  ): Promise<{ totalTrackings: number; completedTrackings: number }> {
+    const query = this.repository.createQueryBuilder('tracking')
+      .innerJoin('tracking.habit', 'habit');
+
+    if (filters.userId) {
+      query.andWhere('habit.user.id = :userId', {
+        userId: filters.userId,
+      });
+    }
+    if (filters.category) {
+      query.andWhere('habit.category = :category', {
+        category: filters.category,
+      });
+    }
+
+    const totalTrackings = await query.getCount();
+    
+    // Create a new query for completed trackings to not mess up the count if cloned
+    const completedQuery = this.repository.createQueryBuilder('tracking')
+      .innerJoin('tracking.habit', 'habit')
+      .where('tracking.status = :status', { status: 'completed' });
+
+    if (filters.userId) {
+      completedQuery.andWhere('habit.user.id = :userId', {
+        userId: filters.userId,
+      });
+    }
+    if (filters.category) {
+      completedQuery.andWhere('habit.category = :category', {
+        category: filters.category,
+      });
+    }
+
+    const completedTrackings = await completedQuery.getCount();
+
+    return { totalTrackings, completedTrackings };
+  }
+
+  async getTrackingDatesForStreak(
+    filters: {
+      userId?: string;
+      category?: string;
+    }
+  ): Promise<Date[]> {
+    const query = this.repository.createQueryBuilder('tracking')
+      .innerJoin('tracking.habit', 'habit')
+      .where('tracking.status = :status', { status: 'completed' })
+      .select('tracking.date', 'date')
+      .orderBy('tracking.date', 'DESC');
+
+    if (filters.userId) {
+      query.andWhere('habit.user.id = :userId', {
+        userId: filters.userId,
+      });
+    }
+    if (filters.category) {
+      query.andWhere('habit.category = :category', {
+        category: filters.category,
+      });
+    }
+
+    const results = await query.getRawMany();
+    return results.map((r: any) => new Date(r.date as string));
+  }
 }

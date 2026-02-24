@@ -1,5 +1,4 @@
 import { DomainError } from 'core/error/domain.error';
-
 export class StatsError extends DomainError {
   constructor(params: {
     code: string;

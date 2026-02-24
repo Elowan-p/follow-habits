@@ -9,23 +9,68 @@ export class StatsService {
     private readonly trackingRepository: TrackingRepositoryInterface,
   ) {}
 
-  // Dynamic stats calculation
-  async getGlobalStats(category?: string) {
-    const habits = await this.habitsRepository.findAll(category);
-    // Ideally tracking should also be filtered by habits of that category.
-    // For now, we return global tracking count or we'd need to fetch tracking associated with those habits.
-    // Let's implement a simple filter for habits first.
+  async getUserStats(userId: string, category?: string) {
+    return this.getGlobalStats(category, userId);
+  }
 
-    // If category is provided, we should only count trackings for those habits.
-    // But TrackingRepository currently doesn't support filtering by habit category easily without join.
-    // We will just return total trackings for now or update it later if strict accuracy is needed.
-    const trackings = await this.trackingRepository.findAll();
+  async getGlobalStats(category?: string, userId?: string) {
+    const habits = await this.habitsRepository.findAll(category, userId);
+    
+    const { totalTrackings, completedTrackings } = await this.trackingRepository.getStats({ userId, category });
+    
+    const completionRate = totalTrackings > 0 
+      ? Math.round((completedTrackings / totalTrackings) * 100) + '%' 
+      : '0%';
+
+    const trackingDates = await this.trackingRepository.getTrackingDatesForStreak({ userId, category });
+    const longestStreak = this.calculateLongestStreak(trackingDates);
 
     return {
+      userId: userId || undefined,
       totalHabits: habits.length,
       category: category || 'ALL',
-      totalTrackings: trackings.length, // Global for now
-      completionRate: trackings.length > 0 ? 'Active' : 'No Activity',
+      completedTrackings,
+      totalTrackings,
+      completionRate,
+      longestStreak,
     };
+  }
+
+  private calculateLongestStreak(dates: Date[]): number {
+    if (!dates || dates.length === 0) return 0;
+    
+    // Dates are expected to be ordered DESC by SQL, but ensure they are correctly processed
+    dates.sort((a, b) => b.getTime() - a.getTime());
+
+    let maxStreak = 1;
+    let currentStreak = 1;
+
+    // Filter out same-day trackings
+    const uniqueDays: string[] = [];
+    for (const date of dates) {
+      const dayString = date.toISOString().split('T')[0];
+      if (uniqueDays.length === 0 || uniqueDays[uniqueDays.length - 1] !== dayString) {
+        uniqueDays.push(dayString);
+      }
+    }
+
+    if (uniqueDays.length === 0) return 0;
+
+    for (let i = 0; i < uniqueDays.length - 1; i++) {
+        const currentDate = new Date(uniqueDays[i]);
+        const nextDate = new Date(uniqueDays[i + 1]);
+
+        const diffTime = Math.abs(currentDate.getTime() - nextDate.getTime());
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+            currentStreak++;
+            maxStreak = Math.max(maxStreak, currentStreak);
+        } else if (diffDays > 1) {
+            currentStreak = 1;
+        }
+    }
+
+    return maxStreak;
   }
 }

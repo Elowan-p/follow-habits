@@ -4,6 +4,7 @@ import { HabitsRepositoryInterface } from './habits.repository.interface';
 import { HabitsError } from './error/habits.error';
 import { CreateHabitDTO } from './dto/create-habit.dto';
 import { UpdateHabitDTO } from './dto/update-habit.dto';
+import { UsersRepositoryInterface } from '../users/users.repository.interface';
 
 describe('HabitsService', () => {
   let service: HabitsService;
@@ -17,11 +18,16 @@ describe('HabitsService', () => {
     remove: jest.fn(),
   };
 
+  const mockUsersRepository = {
+    findOneById: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         HabitsService,
         { provide: HabitsRepositoryInterface, useValue: mockHabitsRepository },
+        { provide: UsersRepositoryInterface, useValue: mockUsersRepository },
       ],
     }).compile();
 
@@ -35,7 +41,9 @@ describe('HabitsService', () => {
   describe('create', () => {
     it('should create a habit', async () => {
       const dto: CreateHabitDTO = { name: 'Run', description: 'Run 5km' };
+      const user = { id: 'uuid' };
       const habit = { id: '1', ...dto, user: { id: 'uuid' } };
+      mockUsersRepository.findOneById.mockResolvedValue(user);
       mockHabitsRepository.create.mockResolvedValue(habit);
 
       const result = await service.create(dto, 'uuid');

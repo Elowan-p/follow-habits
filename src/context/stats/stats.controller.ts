@@ -7,11 +7,12 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiQuery,
 } from '@nestjs/swagger';
-import { UseGuards, Query } from '@nestjs/common';
+import { UseGuards, Query, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
-import { HabitCategory } from '../../context/habits/enums/habit-category.enum';
+import { GetUserStatsDto } from './dto/get-user-stats.dto';
+import { GetGlobalStatsDto } from './dto/get-global-stats.dto';
 import { RightsGuard } from '../../core/rights/guards/rights.guard';
 import { RequireRights } from '../../core/rights/decorators/require-rights.decorator';
 import { STATS_READ } from '../../core/rights/rights.constants';
@@ -23,23 +24,30 @@ import { STATS_READ } from '../../core/rights/rights.constants';
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get stats' })
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user stats' })
   @ApiResponse({ status: 200, type: StatsPresenter })
-  @ApiQuery({
-    name: 'category',
-    required: false,
-    enum: HabitCategory,
-    description: 'Filter stats by habit category',
-  })
+  @HttpCode(HttpStatus.OK)
+  async getUserStats(@Req() req: Request, @Query() query: GetUserStatsDto) {
+    const userId = (req.user as any)?.sub || (req.user as any)?.id;
+    const stats = await this.statsService.getUserStats(userId, query.category);
+    return plainToInstance(StatsPresenter, stats, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get global stats or filtered by user/category (Admin)' })
+  @ApiResponse({ status: 200, type: StatsPresenter })
   @RequireRights(STATS_READ)
   @HttpCode(HttpStatus.OK)
-  async getStats(@Query('category') category?: string) {
-    const stats = await this.statsService.getGlobalStats(category);
-    return plainToInstance(StatsPresenter, stats);
+  async getGlobalStats(@Query() query: GetGlobalStatsDto) {
+    const stats = await this.statsService.getGlobalStats(
+      query.category,
+      query.userId,
+    );
+    return plainToInstance(StatsPresenter, stats, {
+      excludeExtraneousValues: true,
+    });
   }
 }
-/**
- * faire des stats avec des filtres du types santès etc...
- * Permet de vendre certains type de données par exemple x% de personnes à une/des habitudes dans x types de stats
- */

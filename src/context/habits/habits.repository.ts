@@ -15,11 +15,11 @@ export class HabitsRepository implements HabitsRepositoryInterface {
     return this.repository.save(habit);
   }
 
-  async findAll(category?: any): Promise<HabitEntity[]> {
-    if (category) {
-      return this.repository.find({ where: { category } });
-    }
-    return this.repository.find();
+  async findAll(category?: string, userId?: string): Promise<HabitEntity[]> {
+    const where: any = {};
+    if (category) where.category = category;
+    if (userId) where.user = { id: userId };
+    return this.repository.find({ where });
   }
 
   async findOne(id: string): Promise<HabitEntity | null> {

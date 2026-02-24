@@ -1,10 +1,18 @@
 import { Expose } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class StatsPresenter {
+  @ApiPropertyOptional()
+  @Expose()
+  userId?: string;
+
   @ApiProperty()
   @Expose()
   totalHabits: number;
+
+  @ApiProperty()
+  @Expose()
+  category: string;
 
   @ApiProperty()
   @Expose()
@@ -12,5 +20,13 @@ export class StatsPresenter {
 
   @ApiProperty()
   @Expose()
+  completedTrackings: number;
+
+  @ApiProperty()
+  @Expose()
   completionRate: string;
+
+  @ApiProperty()
+  @Expose()
+  longestStreak: number;
 }

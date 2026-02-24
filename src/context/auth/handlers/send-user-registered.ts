@@ -8,7 +8,7 @@ import { EmailService } from '../../notification/email.service';
 import {
   getWelcomeEmailHtml,
   getWelcomeEmailSubject,
-} from '../../notification/templates/welcome.template';
+} from '../../notification/templates/welcome-template';
 
 @Injectable()
 export class SendUserRegisteredHandler {
