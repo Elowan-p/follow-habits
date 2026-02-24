@@ -37,7 +37,9 @@ export class StatsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get global stats or filtered by user/category (Admin)' })
+  @ApiOperation({
+    summary: 'Get global stats or filtered by user/category (Admin)',
+  })
   @ApiResponse({ status: 200, type: StatsPresenter })
   @RequireRights(STATS_READ)
   @HttpCode(HttpStatus.OK)

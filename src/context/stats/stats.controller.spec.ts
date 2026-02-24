@@ -28,11 +28,11 @@ describe('StatsController', () => {
         },
       ],
     })
-    .overrideGuard(JwtAuthGuard)
-    .useValue({ canActivate: () => true })
-    .overrideGuard(RightsGuard)
-    .useValue({ canActivate: () => true })
-    .compile();
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RightsGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<StatsController>(StatsController);
     statsService = module.get(StatsService);
@@ -48,7 +48,7 @@ describe('StatsController', () => {
         user: { sub: 'user-123' },
       };
       const query: GetUserStatsDto = { category: HabitCategory.HEALTH };
-      
+
       const mockServiceResult = {
         userId: 'user-123',
         totalHabits: 5,
@@ -63,7 +63,10 @@ describe('StatsController', () => {
 
       const result = await controller.getUserStats(mockReq as Request, query);
 
-      expect(statsService.getUserStats).toHaveBeenCalledWith('user-123', HabitCategory.HEALTH);
+      expect(statsService.getUserStats).toHaveBeenCalledWith(
+        'user-123',
+        HabitCategory.HEALTH,
+      );
       expect(result).toBeInstanceOf(StatsPresenter);
       expect(result.totalHabits).toBe(5);
       expect(result.completionRate).toBe('66%');
@@ -72,8 +75,11 @@ describe('StatsController', () => {
 
   describe('getGlobalStats', () => {
     it('should return global stats mapping through StatsPresenter', async () => {
-      const query: GetGlobalStatsDto = { category: HabitCategory.SPORT, userId: 'user-456' };
-      
+      const query: GetGlobalStatsDto = {
+        category: HabitCategory.SPORT,
+        userId: 'user-456',
+      };
+
       const mockServiceResult = {
         userId: 'user-456',
         totalHabits: 2,
@@ -88,7 +94,10 @@ describe('StatsController', () => {
 
       const result = await controller.getGlobalStats(query);
 
-      expect(statsService.getGlobalStats).toHaveBeenCalledWith(HabitCategory.SPORT, 'user-456');
+      expect(statsService.getGlobalStats).toHaveBeenCalledWith(
+        HabitCategory.SPORT,
+        'user-456',
+      );
       expect(result).toBeInstanceOf(StatsPresenter);
       expect(result.totalHabits).toBe(2);
       expect(result.completionRate).toBe('100%');

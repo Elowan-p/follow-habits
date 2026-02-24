@@ -31,13 +31,12 @@ export class TrackingRepository implements TrackingRepositoryInterface {
     return this.repository.remove(tracking);
   }
 
-  async getStats(
-    filters: {
-      userId?: string;
-      category?: string;
-    }
-  ): Promise<{ totalTrackings: number; completedTrackings: number }> {
-    const query = this.repository.createQueryBuilder('tracking')
+  async getStats(filters: {
+    userId?: string;
+    category?: string;
+  }): Promise<{ totalTrackings: number; completedTrackings: number }> {
+    const query = this.repository
+      .createQueryBuilder('tracking')
       .innerJoin('tracking.habit', 'habit');
 
     if (filters.userId) {
@@ -52,9 +51,9 @@ export class TrackingRepository implements TrackingRepositoryInterface {
     }
 
     const totalTrackings = await query.getCount();
-    
-    // Create a new query for completed trackings to not mess up the count if cloned
-    const completedQuery = this.repository.createQueryBuilder('tracking')
+
+    const completedQuery = this.repository
+      .createQueryBuilder('tracking')
       .innerJoin('tracking.habit', 'habit')
       .where('tracking.status = :status', { status: 'completed' });
 
@@ -74,13 +73,12 @@ export class TrackingRepository implements TrackingRepositoryInterface {
     return { totalTrackings, completedTrackings };
   }
 
-  async getTrackingDatesForStreak(
-    filters: {
-      userId?: string;
-      category?: string;
-    }
-  ): Promise<Date[]> {
-    const query = this.repository.createQueryBuilder('tracking')
+  async getTrackingDatesForStreak(filters: {
+    userId?: string;
+    category?: string;
+  }): Promise<Date[]> {
+    const query = this.repository
+      .createQueryBuilder('tracking')
       .innerJoin('tracking.habit', 'habit')
       .where('tracking.status = :status', { status: 'completed' })
       .select('tracking.date', 'date')

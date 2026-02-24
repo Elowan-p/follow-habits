@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { DomainError } from 'core/error/domain.error';
 
 export class JwtError extends DomainError {

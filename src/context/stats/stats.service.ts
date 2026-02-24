@@ -15,14 +15,20 @@ export class StatsService {
 
   async getGlobalStats(category?: string, userId?: string) {
     const habits = await this.habitsRepository.findAll(category, userId);
-    
-    const { totalTrackings, completedTrackings } = await this.trackingRepository.getStats({ userId, category });
-    
-    const completionRate = totalTrackings > 0 
-      ? Math.round((completedTrackings / totalTrackings) * 100) + '%' 
-      : '0%';
 
-    const trackingDates = await this.trackingRepository.getTrackingDatesForStreak({ userId, category });
+    const { totalTrackings, completedTrackings } =
+      await this.trackingRepository.getStats({ userId, category });
+
+    const completionRate =
+      totalTrackings > 0
+        ? Math.round((completedTrackings / totalTrackings) * 100) + '%'
+        : '0%';
+
+    const trackingDates =
+      await this.trackingRepository.getTrackingDatesForStreak({
+        userId,
+        category,
+      });
     const longestStreak = this.calculateLongestStreak(trackingDates);
 
     return {
@@ -38,18 +44,19 @@ export class StatsService {
 
   private calculateLongestStreak(dates: Date[]): number {
     if (!dates || dates.length === 0) return 0;
-    
-    // Dates are expected to be ordered DESC by SQL, but ensure they are correctly processed
+
     dates.sort((a, b) => b.getTime() - a.getTime());
 
     let maxStreak = 1;
     let currentStreak = 1;
 
-    // Filter out same-day trackings
     const uniqueDays: string[] = [];
     for (const date of dates) {
       const dayString = date.toISOString().split('T')[0];
-      if (uniqueDays.length === 0 || uniqueDays[uniqueDays.length - 1] !== dayString) {
+      if (
+        uniqueDays.length === 0 ||
+        uniqueDays[uniqueDays.length - 1] !== dayString
+      ) {
         uniqueDays.push(dayString);
       }
     }
@@ -57,18 +64,18 @@ export class StatsService {
     if (uniqueDays.length === 0) return 0;
 
     for (let i = 0; i < uniqueDays.length - 1; i++) {
-        const currentDate = new Date(uniqueDays[i]);
-        const nextDate = new Date(uniqueDays[i + 1]);
+      const currentDate = new Date(uniqueDays[i]);
+      const nextDate = new Date(uniqueDays[i + 1]);
 
-        const diffTime = Math.abs(currentDate.getTime() - nextDate.getTime());
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      const diffTime = Math.abs(currentDate.getTime() - nextDate.getTime());
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 1) {
-            currentStreak++;
-            maxStreak = Math.max(maxStreak, currentStreak);
-        } else if (diffDays > 1) {
-            currentStreak = 1;
-        }
+      if (diffDays === 1) {
+        currentStreak++;
+        maxStreak = Math.max(maxStreak, currentStreak);
+      } else if (diffDays > 1) {
+        currentStreak = 1;
+      }
     }
 
     return maxStreak;

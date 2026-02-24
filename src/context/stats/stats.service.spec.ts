@@ -40,16 +40,27 @@ describe('StatsService', () => {
 
   describe('getGlobalStats', () => {
     it('should return computed stats with 0% completion rate when no trackings exist', async () => {
-      habitsRepository.findAll.mockResolvedValue([{} as any, {} as any]); // 2 habits
-      trackingRepository.getStats.mockResolvedValue({ totalTrackings: 0, completedTrackings: 0 });
+      habitsRepository.findAll.mockResolvedValue([{} as any, {} as any]);
+      trackingRepository.getStats.mockResolvedValue({
+        totalTrackings: 0,
+        completedTrackings: 0,
+      });
       trackingRepository.getTrackingDatesForStreak.mockResolvedValue([]);
 
       const result = await service.getGlobalStats();
 
-      expect(habitsRepository.findAll).toHaveBeenCalledWith(undefined, undefined);
-      expect(trackingRepository.getStats).toHaveBeenCalledWith({ userId: undefined, category: undefined });
-      expect(trackingRepository.getTrackingDatesForStreak).toHaveBeenCalledWith({ userId: undefined, category: undefined });
-      
+      expect(habitsRepository.findAll).toHaveBeenCalledWith(
+        undefined,
+        undefined,
+      );
+      expect(trackingRepository.getStats).toHaveBeenCalledWith({
+        userId: undefined,
+        category: undefined,
+      });
+      expect(trackingRepository.getTrackingDatesForStreak).toHaveBeenCalledWith(
+        { userId: undefined, category: undefined },
+      );
+
       expect(result).toEqual({
         userId: undefined,
         totalHabits: 2,
@@ -63,7 +74,10 @@ describe('StatsService', () => {
 
     it('should calculate the correct completion rate', async () => {
       habitsRepository.findAll.mockResolvedValue([{} as any, {} as any]);
-      trackingRepository.getStats.mockResolvedValue({ totalTrackings: 10, completedTrackings: 8 });
+      trackingRepository.getStats.mockResolvedValue({
+        totalTrackings: 10,
+        completedTrackings: 8,
+      });
       trackingRepository.getTrackingDatesForStreak.mockResolvedValue([]);
 
       const result = await service.getGlobalStats();
@@ -75,13 +89,16 @@ describe('StatsService', () => {
 
     it('should calculate the longest streak correctly based on dates', async () => {
       habitsRepository.findAll.mockResolvedValue([]);
-      trackingRepository.getStats.mockResolvedValue({ totalTrackings: 3, completedTrackings: 3 });
-      
+      trackingRepository.getStats.mockResolvedValue({
+        totalTrackings: 3,
+        completedTrackings: 3,
+      });
+
       const dates = [
         new Date('2026-02-24T10:00:00Z'),
         new Date('2026-02-23T10:00:00Z'),
         new Date('2026-02-22T10:00:00Z'),
-        // Gap here: no 02-21
+
         new Date('2026-02-20T10:00:00Z'),
         new Date('2026-02-19T10:00:00Z'),
       ];
@@ -89,28 +106,45 @@ describe('StatsService', () => {
 
       const result = await service.getGlobalStats();
 
-      expect(result.longestStreak).toBe(3); // 22, 23, 24 are consecutive
+      expect(result.longestStreak).toBe(3);
     });
 
     it('should filter by user and category', async () => {
       habitsRepository.findAll.mockResolvedValue([]);
-      trackingRepository.getStats.mockResolvedValue({ totalTrackings: 0, completedTrackings: 0 });
+      trackingRepository.getStats.mockResolvedValue({
+        totalTrackings: 0,
+        completedTrackings: 0,
+      });
       trackingRepository.getTrackingDatesForStreak.mockResolvedValue([]);
 
       await service.getGlobalStats(HabitCategory.HEALTH, 'user-123');
 
-      expect(habitsRepository.findAll).toHaveBeenCalledWith(HabitCategory.HEALTH, 'user-123');
-      expect(trackingRepository.getStats).toHaveBeenCalledWith({ userId: 'user-123', category: HabitCategory.HEALTH });
+      expect(habitsRepository.findAll).toHaveBeenCalledWith(
+        HabitCategory.HEALTH,
+        'user-123',
+      );
+      expect(trackingRepository.getStats).toHaveBeenCalledWith({
+        userId: 'user-123',
+        category: HabitCategory.HEALTH,
+      });
     });
   });
 
   describe('getUserStats', () => {
     it('should call getGlobalStats with the category and userId', async () => {
-      jest.spyOn(service, 'getGlobalStats').mockResolvedValue('mockedResult' as any);
+      jest
+        .spyOn(service, 'getGlobalStats')
+        .mockResolvedValue('mockedResult' as any);
 
-      const result = await service.getUserStats('user-123', HabitCategory.SPORT);
+      const result = await service.getUserStats(
+        'user-123',
+        HabitCategory.SPORT,
+      );
 
-      expect(service.getGlobalStats).toHaveBeenCalledWith(HabitCategory.SPORT, 'user-123');
+      expect(service.getGlobalStats).toHaveBeenCalledWith(
+        HabitCategory.SPORT,
+        'user-123',
+      );
       expect(result).toBe('mockedResult');
     });
   });

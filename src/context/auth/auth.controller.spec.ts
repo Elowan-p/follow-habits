@@ -37,7 +37,7 @@ describe('AuthController', () => {
     it('should call authService.login and return LoginPresenter', () => {
       const dto: loginDTO = { email: 'test@test.com', password: 'password123' };
       const serviceResponse = { accessToken: 'jwt-token', user: { id: '1' } };
-      
+
       mockAuthService.login.mockReturnValue(serviceResponse);
 
       const result = controller.login(dto);
@@ -50,9 +50,13 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should call authService.register and return RegisterPresenter', () => {
-      const dto: registerDTO = { username: 'testuser', email: 'test@test.com', password: 'password123' };
+      const dto: registerDTO = {
+        username: 'testuser',
+        email: 'test@test.com',
+        password: 'password123',
+      };
       const serviceResponse = { accessToken: 'jwt-token', user: { id: '1' } };
-      
+
       mockAuthService.register.mockReturnValue(serviceResponse);
 
       const result = controller.register(dto);

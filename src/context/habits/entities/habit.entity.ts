@@ -19,7 +19,6 @@ export class HabitEntity {
   @ManyToOne(() => UserEntity, (user) => user.habits, { onDelete: 'CASCADE' })
   user: UserEntity;
 
-  // Relation inverse
   @OneToMany(() => TrackingEntity, (tracking) => tracking.habit)
   trackings: TrackingEntity[];
 

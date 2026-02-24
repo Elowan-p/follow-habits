@@ -16,7 +16,6 @@ import { ROLE_USER } from '../../core/rights/roles';
 
 @Injectable()
 export class AuthService {
-  // eslint-disable-next-line prettier/prettier
   constructor(
     private readonly authRepository: AuthRepositoryInterface,
     @Inject(IJwtService)
@@ -27,13 +26,12 @@ export class AuthService {
   ) {}
 
   async register(body: registerDTO) {
-    // 1. Create AuthCredential
     const authCredential = new AuthCredentialEntity();
     authCredential.email = body.email;
     authCredential.passwordHashed = await bcrypt.hash(body.password, 10);
     const savedAuth =
       await this.authRepository.createCredential(authCredential);
-    // 2. Create User Profile
+
     const user = new UserEntity();
     user.email = body.email;
     user.name = body.username;

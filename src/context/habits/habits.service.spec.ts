@@ -96,10 +96,10 @@ describe('HabitsService', () => {
     it('should remove a habit if found', async () => {
       const habit = { id: '1', name: 'Run' };
       mockHabitsRepository.findOne.mockResolvedValue(habit);
-      mockHabitsRepository.remove.mockResolvedValue(undefined); // remove returns void usually, or the entity?
+      mockHabitsRepository.remove.mockResolvedValue(undefined);
 
       const result = await service.remove('1');
-      // Check implementation of verify: returns the habit
+
       expect(result).toEqual(habit);
     });
 

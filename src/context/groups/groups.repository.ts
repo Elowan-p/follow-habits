@@ -40,9 +40,9 @@ export class GroupsRepository implements GroupsRepositoryInterface {
   }
 
   async findMembersByGroupId(groupId: string): Promise<GroupMemberEntity[]> {
-    return this.memberRepo.find({ 
+    return this.memberRepo.find({
       where: { group: { id: groupId } },
-      relations: ['user'] // added relation to avoid user.id being undefined
+      relations: ['user'],
     });
   }
 

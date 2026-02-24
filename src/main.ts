@@ -4,7 +4,6 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DomainErrorFilter } from './core/error/domain.error.filter';
 
-// Fix for BigInt serialization
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
 };

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 export class DomainError extends Error {
   public readonly code: string;
   public readonly statusCode: number;

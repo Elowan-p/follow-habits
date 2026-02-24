@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable prettier/prettier */
 import {
   ArgumentsHost,
   Catch,
@@ -54,7 +48,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return response.status(exception.statusCode).send(payload);
     }
 
-    // 2) Nest HttpException
     if (exception instanceof HttpException) {
       const statusCode = exception.getStatus();
       const raw = exception.getResponse();
@@ -79,7 +72,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return response.status(statusCode).send(payload);
     }
 
-    // 3) Unknown error -> 500
     const statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 
     const payload: ApiErrorBody = {
@@ -87,7 +79,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message: (exception as any)?.message ?? 'Unexpected error',
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.log(
       statusCode,
       method,
@@ -153,7 +144,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const line = `[${method}] ${path} -> ${statusCode} ${code}: ${message}`;
 
     if (statusCode >= 500) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       this.logger.error(line, (exception as any)?.stack);
     } else {
       this.logger.warn(line);

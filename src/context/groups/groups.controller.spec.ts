@@ -54,7 +54,7 @@ describe('GroupsController', () => {
       mockGroupsService.createGroup.mockResolvedValue({ id: 'g1', ...dto });
 
       const result = await controller.createGroup(dto, req);
-      
+
       expect(mockGroupsService.createGroup).toHaveBeenCalledWith(dto, 'user-1');
       expect(result).toEqual({ id: 'g1', ...dto });
     });
@@ -66,7 +66,7 @@ describe('GroupsController', () => {
       mockGroupsService.joinGroup.mockResolvedValue({ id: 'g1' });
 
       const result = await controller.joinGroup('g1', req);
-      
+
       expect(mockGroupsService.joinGroup).toHaveBeenCalledWith('g1', 'user-2');
       expect(result).toEqual({ id: 'g1' });
     });
@@ -83,8 +83,12 @@ describe('GroupsController', () => {
       mockGroupsService.addHabit.mockResolvedValue({ id: 'h1', ...dto });
 
       const result = await controller.addHabit('g1', dto, req);
-      
-      expect(mockGroupsService.addHabit).toHaveBeenCalledWith('g1', 'user-1', dto);
+
+      expect(mockGroupsService.addHabit).toHaveBeenCalledWith(
+        'g1',
+        'user-1',
+        dto,
+      );
       expect(result).toEqual({ id: 'h1', ...dto });
     });
   });
@@ -96,18 +100,26 @@ describe('GroupsController', () => {
       mockGroupsService.trackHabit.mockResolvedValue({ id: 't1', ...dto });
 
       const result = await controller.trackHabit('g1', 'h1', dto, req);
-      
-      expect(mockGroupsService.trackHabit).toHaveBeenCalledWith('g1', 'h1', 'user-1', dto);
+
+      expect(mockGroupsService.trackHabit).toHaveBeenCalledWith(
+        'g1',
+        'h1',
+        'user-1',
+        dto,
+      );
       expect(result).toEqual({ id: 't1', ...dto });
     });
   });
 
   describe('getGroup', () => {
     it('should call groupsService.getGroupDetails', async () => {
-      mockGroupsService.getGroupDetails.mockResolvedValue({ id: 'g1', name: 'Group' });
+      mockGroupsService.getGroupDetails.mockResolvedValue({
+        id: 'g1',
+        name: 'Group',
+      });
 
       const result = await controller.getGroup('g1');
-      
+
       expect(mockGroupsService.getGroupDetails).toHaveBeenCalledWith('g1');
       expect(result).toEqual({ id: 'g1', name: 'Group' });
     });
@@ -117,9 +129,16 @@ describe('GroupsController', () => {
     it('should call groupsService.updateMemberRole', async () => {
       const dto: UpdateMemberRoleDto = { role: GroupRole.CO_ADMIN };
       const req = mockRequest('admin-user');
-      mockGroupsService.updateMemberRole.mockResolvedValue({ role: GroupRole.CO_ADMIN });
+      mockGroupsService.updateMemberRole.mockResolvedValue({
+        role: GroupRole.CO_ADMIN,
+      });
 
-      const result = await controller.updateMemberRole('g1', 'target-user', dto, req);
+      const result = await controller.updateMemberRole(
+        'g1',
+        'target-user',
+        dto,
+        req,
+      );
 
       expect(mockGroupsService.updateMemberRole).toHaveBeenCalledWith(
         'g1',

@@ -6,17 +6,13 @@ export abstract class TrackingRepositoryInterface {
   abstract findOne(id: string): Promise<TrackingEntity | null>;
   abstract update(tracking: TrackingEntity): Promise<TrackingEntity>;
   abstract remove(tracking: TrackingEntity): Promise<TrackingEntity>;
-  
-  abstract getStats(
-    filters: {
-      userId?: string;
-      category?: string;
-    }
-  ): Promise<{ totalTrackings: number; completedTrackings: number }>;
-  abstract getTrackingDatesForStreak(
-    filters: {
-      userId?: string;
-      category?: string;
-    }
-  ): Promise<Date[]>;
+
+  abstract getStats(filters: {
+    userId?: string;
+    category?: string;
+  }): Promise<{ totalTrackings: number; completedTrackings: number }>;
+  abstract getTrackingDatesForStreak(filters: {
+    userId?: string;
+    category?: string;
+  }): Promise<Date[]>;
 }

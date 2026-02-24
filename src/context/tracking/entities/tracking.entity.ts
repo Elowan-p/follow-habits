@@ -21,7 +21,7 @@ export class TrackingEntity {
   date: Date;
 
   @Column({ type: 'varchar', length: 50 })
-  status: string; // ex: "completed", "skipped"
+  status: string;
 
   @CreateDateColumn()
   createdAt: Date;

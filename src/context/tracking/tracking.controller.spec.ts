@@ -37,7 +37,11 @@ describe('TrackingController', () => {
 
   describe('create', () => {
     it('should call trackingService.create and return presenter', () => {
-      const dto: CreateTrackingDTO = { habitId: 'h1', isCompleted: true, date: new Date().toISOString() };
+      const dto: CreateTrackingDTO = {
+        habitId: 'h1',
+        isCompleted: true,
+        date: new Date().toISOString(),
+      };
       mockTrackingService.create.mockReturnValue({ id: 't1', ...dto });
 
       const result = controller.create(dto);
@@ -50,7 +54,7 @@ describe('TrackingController', () => {
   describe('findAll', () => {
     it('should call trackingService.findAll and return array of presenters', () => {
       mockTrackingService.findAll.mockReturnValue([
-        { id: 't1', isCompleted: true }
+        { id: 't1', isCompleted: true },
       ]);
 
       const result = controller.findAll();
@@ -73,7 +77,10 @@ describe('TrackingController', () => {
   describe('update', () => {
     it('should call trackingService.update and return presenter', () => {
       const dto: UpdateTrackingDTO = { isCompleted: false };
-      mockTrackingService.update.mockReturnValue({ id: 't1', isCompleted: false });
+      mockTrackingService.update.mockReturnValue({
+        id: 't1',
+        isCompleted: false,
+      });
 
       const result = controller.update('t1', dto);
       expect(mockTrackingService.update).toHaveBeenCalledWith('t1', dto);

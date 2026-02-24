@@ -17,7 +17,7 @@ import { UsersModule } from '../users/users.module';
       GroupHabitEntity,
       GroupTrackingEntity,
     ]),
-    UsersModule, // Needed for UsersRepository injection
+    UsersModule,
   ],
   controllers: [GroupsController],
   providers: [

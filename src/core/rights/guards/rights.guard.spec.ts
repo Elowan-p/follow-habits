@@ -40,7 +40,9 @@ describe('RightsGuard', () => {
     const context = createMockContext(undefined);
 
     expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
-    expect(() => guard.canActivate(context)).toThrow('Insufficient rights: No user rights found');
+    expect(() => guard.canActivate(context)).toThrow(
+      'Insufficient rights: No user rights found',
+    );
   });
 
   describe('Standard User Role (ROLE_USER)', () => {
@@ -77,21 +79,20 @@ describe('RightsGuard', () => {
     });
   });
   describe('Stringified rights conversion (DB BigInt format)', () => {
-     it('should handle rights provided as strings', () => {
-        reflector.getAllAndOverride.mockReturnValue(GROUPS_CREATE);
+    it('should handle rights provided as strings', () => {
+      reflector.getAllAndOverride.mockReturnValue(GROUPS_CREATE);
 
-        const context = {
-            getHandler: jest.fn(),
-            getClass: jest.fn(),
-            switchToHttp: () => ({
-              getRequest: () => ({
-                user: { rights: ROLE_USER.toString() }, // Pass as string
-              }),
-            }),
-          } as any;
-          
-        expect(guard.canActivate(context)).toBe(true);
-     });
+      const context = {
+        getHandler: jest.fn(),
+        getClass: jest.fn(),
+        switchToHttp: () => ({
+          getRequest: () => ({
+            user: { rights: ROLE_USER.toString() },
+          }),
+        }),
+      } as any;
+
+      expect(guard.canActivate(context)).toBe(true);
+    });
   });
-
 });

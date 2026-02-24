@@ -23,7 +23,6 @@ export class GroupHabitEntity {
   @JoinColumn({ name: 'group_id' })
   group: GroupEntity;
 
-  // Inverse relation
   @OneToMany(() => GroupTrackingEntity, (tracking) => tracking.habit, {
     cascade: true,
   })

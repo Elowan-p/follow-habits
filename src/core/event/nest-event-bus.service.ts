@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
 import { EventBusPort } from './event-bus.port';
 import { EventEmitter2 } from '@nestjs/event-emitter';

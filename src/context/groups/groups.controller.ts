@@ -36,7 +36,10 @@ export class GroupsController {
   @ApiOperation({ summary: 'Create a new group' })
   @RequireRights(GROUPS_CREATE)
   @HttpCode(HttpStatus.CREATED)
-  async createGroup(@Body() createGroupDto: CreateGroupDto, @Req() req: Request) {
+  async createGroup(
+    @Body() createGroupDto: CreateGroupDto,
+    @Req() req: Request,
+  ) {
     const userId = (req.user as any)?.sub || (req.user as any)?.id;
     return this.groupsService.createGroup(createGroupDto, userId);
   }

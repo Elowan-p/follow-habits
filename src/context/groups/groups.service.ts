@@ -39,7 +39,7 @@ export class GroupsService {
     group.description = createGroupDto.description || '';
     group.points = 0;
     group.badges = [];
-    
+
     // Save group first
     const savedGroup = await this.groupsRepo.createGroup(group);
 
@@ -68,9 +68,9 @@ export class GroupsService {
 
     const existingMembers = await this.groupsRepo.findMembersByGroupId(groupId);
     const isAlreadyMember = existingMembers.some((m) => m.user.id === userId);
-    
+
     if (isAlreadyMember) {
-      return group; // Already joined
+      return group;
     }
 
     const member = new GroupMemberEntity();
@@ -82,7 +82,11 @@ export class GroupsService {
     return this.groupsRepo.findGroupById(groupId);
   }
 
-  async addHabit(groupId: string, userId: string, addHabitDto: AddGroupHabitDto) {
+  async addHabit(
+    groupId: string,
+    userId: string,
+    addHabitDto: AddGroupHabitDto,
+  ) {
     const group = await this.groupsRepo.findGroupById(groupId);
     if (!group) throw GroupsError.groupNotFound(groupId);
 
@@ -91,8 +95,11 @@ export class GroupsService {
 
     if (!userMember) throw GroupsError.notMember();
 
-    if (userMember.role !== GroupRole.ADMIN && userMember.role !== GroupRole.CO_ADMIN) {
-      throw GroupsError.notMember(); // Could be a specific InsufficientGroupRights error, but this works
+    if (
+      userMember.role !== GroupRole.ADMIN &&
+      userMember.role !== GroupRole.CO_ADMIN
+    ) {
+      throw GroupsError.notMember();
     }
 
     const habit = new GroupHabitEntity();
@@ -133,9 +140,6 @@ export class GroupsService {
       });
     }
 
-    // To simplify: we don't strictly block multiple trackings per day here, 
-    // but in a real app we would check `countTrackingsForHabitAndUser` and date.
-    
     const tracking = new GroupTrackingEntity();
     tracking.habit = habit;
     tracking.user = user;
@@ -144,7 +148,6 @@ export class GroupsService {
 
     await this.groupsRepo.createTracking(tracking);
 
-    // If completed, add points to group
     if (tracking.status === TrackingStatus.COMPLETED) {
       group.points += habit.pointsReward;
       this.checkAndUnlockBadges(group);
@@ -166,16 +169,15 @@ export class GroupsService {
     const members = await this.groupsRepo.findMembersByGroupId(groupId);
     const requester = members.find((m) => m.user.id === requesterId);
     if (!requester || requester.role !== GroupRole.ADMIN) {
-      throw GroupsError.notMember(); // Only the main ADMIN can promote/demote (or change this if needed)
+      throw GroupsError.notMember();
     }
 
     const targetMember = members.find((m) => m.user.id === targetUserId);
     if (!targetMember) throw GroupsError.notMember();
 
-    // The creator (first admin) can promote others to CO_ADMIN or ADMIN.
     targetMember.role = newRole;
-    await this.groupsRepo.addMember(targetMember); // save the updated member
-    
+    await this.groupsRepo.addMember(targetMember);
+
     return targetMember;
   }
 
@@ -187,7 +189,7 @@ export class GroupsService {
 
   private checkAndUnlockBadges(group: GroupEntity) {
     if (!group.badges) group.badges = [];
-    
+
     const thresholds = [
       { points: 100, name: 'Bronze' },
       { points: 500, name: 'Silver' },
@@ -197,9 +199,9 @@ export class GroupsService {
     ];
 
     for (const t of thresholds) {
-        if (group.points >= t.points && !group.badges.includes(t.name)) {
-            group.badges.push(t.name);
-        }
+      if (group.points >= t.points && !group.badges.includes(t.name)) {
+        group.badges.push(t.name);
+      }
     }
   }
 }

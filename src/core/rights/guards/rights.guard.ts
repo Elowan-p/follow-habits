@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RIGHTS_KEY } from '../decorators/require-rights.decorator';
 import { RightsUtils } from '../rights.utils';
@@ -9,10 +14,10 @@ export class RightsGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRights = this.reflector.getAllAndOverride<bigint>(RIGHTS_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRights = this.reflector.getAllAndOverride<bigint>(
+      RIGHTS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!requiredRights) {
       return true;
@@ -20,11 +25,13 @@ export class RightsGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
     if (!user || !user.rights) {
-        throw new ForbiddenException('Insufficient rights: No user rights found');
+      throw new ForbiddenException('Insufficient rights: No user rights found');
     }
-    const userRights = typeof user.rights === 'string' ? BigInt(user.rights) : BigInt(user.rights);
+    const userRights =
+      typeof user.rights === 'string'
+        ? BigInt(user.rights)
+        : BigInt(user.rights);
 
-    // SYSTEM_MANAGE (admin) bypasses all granular rights checks
     if (RightsUtils.hasAll(userRights, SYSTEM_MANAGE)) {
       return true;
     }

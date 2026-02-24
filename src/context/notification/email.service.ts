@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { EmailServiceInterface, SendEmailDto } from './email.service.interface';
-//Regarder en ligne de commande pour voir l'email reçu il y aura un lien ethereal pour voir le corps du mail et ce qui est dit dedans
+
 @Injectable()
 export class EmailService implements EmailServiceInterface {
   private transporter: nodemailer.Transporter;
@@ -41,7 +41,6 @@ export class EmailService implements EmailServiceInterface {
   async send(payload: SendEmailDto): Promise<void> {
     await this.initPromise;
     if (!this.transporter) {
-      // Should not happen if initPromise resolves correctly, but safe guard
       await this.initTransporter();
     }
 

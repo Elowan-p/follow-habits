@@ -44,11 +44,14 @@ describe('HabitsController', () => {
 
   describe('create', () => {
     it('should call habitsService.create and return a presenter', () => {
-      const dto: CreateHabitDTO = { name: 'Test', category: HabitCategory.SPORT };
+      const dto: CreateHabitDTO = {
+        name: 'Test',
+        category: HabitCategory.SPORT,
+      };
       mockHabitsService.create.mockReturnValue({ id: 'h1', ...dto });
 
       const result = controller.create(dto, mockRequest('user-1'));
-      
+
       expect(mockHabitsService.create).toHaveBeenCalledWith(dto, 'user-1');
       expect(result).toBeInstanceOf(HabitPresenter);
       expect(result.id).toBe('h1');
@@ -57,12 +60,10 @@ describe('HabitsController', () => {
 
   describe('findAll', () => {
     it('should call habitsService.findAll and return an array of presenters', () => {
-      mockHabitsService.findAll.mockReturnValue([
-        { id: 'h1', name: 'Test' }
-      ]);
+      mockHabitsService.findAll.mockReturnValue([{ id: 'h1', name: 'Test' }]);
 
       const result = controller.findAll();
-      
+
       expect(mockHabitsService.findAll).toHaveBeenCalled();
       expect(Array.isArray(result)).toBe(true);
       expect(result[0]).toBeInstanceOf(HabitPresenter);
@@ -74,7 +75,7 @@ describe('HabitsController', () => {
       mockHabitsService.findOne.mockReturnValue({ id: 'h1', name: 'Test' });
 
       const result = controller.findOne('h1');
-      
+
       expect(mockHabitsService.findOne).toHaveBeenCalledWith('h1');
       expect(result.id).toBe('h1');
     });
@@ -86,7 +87,7 @@ describe('HabitsController', () => {
       mockHabitsService.update.mockReturnValue({ id: 'h1', name: 'Updated' });
 
       const result = controller.update('h1', dto);
-      
+
       expect(mockHabitsService.update).toHaveBeenCalledWith('h1', dto);
       expect(result.name).toBe('Updated');
     });
@@ -97,7 +98,7 @@ describe('HabitsController', () => {
       mockHabitsService.remove.mockReturnValue({ id: 'h1' });
 
       const result = controller.remove('h1');
-      
+
       expect(mockHabitsService.remove).toHaveBeenCalledWith('h1');
       expect(result.id).toBe('h1');
     });

@@ -7,7 +7,7 @@ describe('RightsUtils', () => {
       let mask = 0n;
       mask = RightsUtils.add(mask, USER_READ);
       expect(mask).toBe(USER_READ);
-      
+
       mask = RightsUtils.add(mask, USER_UPDATE);
       expect(mask).toBe(USER_READ | USER_UPDATE);
     });

@@ -33,8 +33,7 @@ export const ROLE_USER =
   GROUPS_UPDATE |
   GROUPS_DELETE;
 
-export const ROLE_USER_VIP =
-  ROLE_USER | USER_READ | USER_UPDATE; // Example: VIP can maybe read/update their own profile more extensively? Or just a placeholder for now.
+export const ROLE_USER_VIP = ROLE_USER | USER_READ | USER_UPDATE;
 
 export const ROLE_ADMIN =
   ROLE_USER_VIP | USER_DELETE | SYSTEM_MANAGE | USER_READ | USER_UPDATE;

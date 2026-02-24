@@ -58,7 +58,7 @@ describe('GroupsService', () => {
       mockUser.id = 'user-1';
 
       mockUsersRepo.findOneById.mockResolvedValue(mockUser);
-      
+
       const mockGroup = new GroupEntity();
       mockGroup.id = 'group-1';
       mockGroup.name = 'Test Group';
@@ -95,25 +95,27 @@ describe('GroupsService', () => {
     it('should add a given user as a MEMBER to an existing group', async () => {
       const mockUser = new UserEntity();
       mockUser.id = 'user-2';
-      
+
       const mockGroup = new GroupEntity();
       mockGroup.id = 'group-1';
-      
+
       mockUsersRepo.findOneById.mockResolvedValue(mockUser);
       mockGroupsRepo.findGroupById.mockResolvedValue(mockGroup);
       mockGroupsRepo.findMembersByGroupId.mockResolvedValue([]);
-      
+
       const savedMember = new GroupMemberEntity();
       savedMember.user = mockUser;
       savedMember.group = mockGroup;
       savedMember.role = GroupRole.MEMBER;
-      
+
       mockGroupsRepo.addMember.mockResolvedValue(savedMember);
 
       const result = await service.joinGroup('group-1', 'user-2');
 
       expect(mockGroupsRepo.addMember).toHaveBeenCalled();
-      expect(mockGroupsRepo.addMember.mock.calls[0][0].role).toBe(GroupRole.MEMBER);
+      expect(mockGroupsRepo.addMember.mock.calls[0][0].role).toBe(
+        GroupRole.MEMBER,
+      );
       expect(result.id).toBe('group-1');
     });
 
@@ -130,11 +132,11 @@ describe('GroupsService', () => {
       mockUsersRepo.findOneById.mockResolvedValue(mockUser);
       mockGroupsRepo.findGroupById.mockResolvedValue(mockGroup);
       mockGroupsRepo.findMembersByGroupId.mockResolvedValue([
-        { user: mockUser } as GroupMemberEntity
+        { user: mockUser } as GroupMemberEntity,
       ]);
 
       const result = await service.joinGroup('g1', 'user-in-group');
-      // addMember should not be called again
+
       expect(mockGroupsRepo.addMember).not.toHaveBeenCalled();
       expect(result.id).toBe('g1');
     });
@@ -156,29 +158,38 @@ describe('GroupsService', () => {
 
     it('should succeed if user is ADMIN', async () => {
       mockGroupsRepo.findMembersByGroupId.mockResolvedValue([
-        { user: mockUser, role: GroupRole.ADMIN } as GroupMemberEntity
+        { user: mockUser, role: GroupRole.ADMIN } as GroupMemberEntity,
       ]);
 
-      await service.addHabit('group-add-habit', 'admin-user', { name: 'Test Habit', category: HabitCategory.SPORT });
+      await service.addHabit('group-add-habit', 'admin-user', {
+        name: 'Test Habit',
+        category: HabitCategory.SPORT,
+      });
       expect(mockGroupsRepo.createHabit).toHaveBeenCalled();
     });
 
     it('should succeed if user is CO_ADMIN', async () => {
       mockGroupsRepo.findMembersByGroupId.mockResolvedValue([
-        { user: mockUser, role: GroupRole.CO_ADMIN } as GroupMemberEntity
+        { user: mockUser, role: GroupRole.CO_ADMIN } as GroupMemberEntity,
       ]);
 
-      await service.addHabit('group-add-habit', 'admin-user', { name: 'Test Habit', category: HabitCategory.SPORT });
+      await service.addHabit('group-add-habit', 'admin-user', {
+        name: 'Test Habit',
+        category: HabitCategory.SPORT,
+      });
       expect(mockGroupsRepo.createHabit).toHaveBeenCalled();
     });
 
     it('should throw if user is only MEMBER', async () => {
       mockGroupsRepo.findMembersByGroupId.mockResolvedValue([
-        { user: mockUser, role: GroupRole.MEMBER } as GroupMemberEntity
+        { user: mockUser, role: GroupRole.MEMBER } as GroupMemberEntity,
       ]);
 
       await expect(
-        service.addHabit('group-add-habit', 'admin-user', { name: 'Test', category: HabitCategory.OTHER })
+        service.addHabit('group-add-habit', 'admin-user', {
+          name: 'Test',
+          category: HabitCategory.OTHER,
+        }),
       ).rejects.toThrow(GroupsError);
     });
   });
@@ -200,14 +211,25 @@ describe('GroupsService', () => {
     });
 
     it('should allow ADMIN to promote a user', async () => {
-      const targetMember = { user: regularUser, role: GroupRole.MEMBER } as GroupMemberEntity;
+      const targetMember = {
+        user: regularUser,
+        role: GroupRole.MEMBER,
+      } as GroupMemberEntity;
       mockGroupsRepo.findMembersByGroupId.mockResolvedValue([
         { user: adminUser, role: GroupRole.ADMIN } as GroupMemberEntity,
         targetMember,
       ]);
-      mockGroupsRepo.addMember.mockResolvedValue({ ...targetMember, role: GroupRole.CO_ADMIN } as GroupMemberEntity);
+      mockGroupsRepo.addMember.mockResolvedValue({
+        ...targetMember,
+        role: GroupRole.CO_ADMIN,
+      } as GroupMemberEntity);
 
-      const result = await service.updateMemberRole('group-roles', 'regular-user', GroupRole.CO_ADMIN, 'admin-user');
+      const result = await service.updateMemberRole(
+        'group-roles',
+        'regular-user',
+        GroupRole.CO_ADMIN,
+        'admin-user',
+      );
 
       expect(mockGroupsRepo.addMember).toHaveBeenCalled();
       expect(result.role).toBe(GroupRole.CO_ADMIN);
@@ -220,7 +242,12 @@ describe('GroupsService', () => {
       ]);
 
       await expect(
-        service.updateMemberRole('group-roles', 'regular-user', GroupRole.ADMIN, 'admin-user')
+        service.updateMemberRole(
+          'group-roles',
+          'regular-user',
+          GroupRole.ADMIN,
+          'admin-user',
+        ),
       ).rejects.toThrow(GroupsError);
     });
   });
@@ -238,7 +265,7 @@ describe('GroupsService', () => {
 
       mockHabit = new GroupHabitEntity();
       mockHabit.id = 'habit-1';
-      mockHabit.pointsReward = 20; // 20 pts pour la démo
+      mockHabit.pointsReward = 20;
       mockHabit.group = mockGroup;
 
       mockUser = new UserEntity();
@@ -259,13 +286,11 @@ describe('GroupsService', () => {
 
       expect(mockGroupsRepo.createTracking).toHaveBeenCalled();
       expect(mockGroupsRepo.saveGroup).toHaveBeenCalled();
-      
-      // Points should be added
+
       expect(mockGroup.points).toBe(20);
     });
 
     it('should unlock Bronze badge when points reach 100', async () => {
-      // Setup the group right before reaching Bronze
       mockGroup.points = 90;
 
       await service.trackHabit('group-1', 'habit-1', 'user-1', {
@@ -278,7 +303,7 @@ describe('GroupsService', () => {
 
     it('should unlock Silver badge but keep Bronze when passing 500', async () => {
       mockGroup.points = 490;
-      mockGroup.badges = ['Bronze']; // Déjà débloqué
+      mockGroup.badges = ['Bronze'];
 
       await service.trackHabit('group-1', 'habit-1', 'user-1', {
         status: TrackingStatus.COMPLETED,
@@ -290,13 +315,14 @@ describe('GroupsService', () => {
     });
 
     it('should throw if user is not a member of the group', async () => {
-      // Simulate that only user-2 is a member, not user-1
       mockGroupsRepo.findMembersByGroupId.mockResolvedValue([
         { user: { id: 'user-2' }, group: mockGroup, role: GroupRole.MEMBER },
       ]);
 
       await expect(
-        service.trackHabit('group-1', 'habit-1', 'user-1', { status: TrackingStatus.COMPLETED }),
+        service.trackHabit('group-1', 'habit-1', 'user-1', {
+          status: TrackingStatus.COMPLETED,
+        }),
       ).rejects.toThrow(GroupsError);
     });
   });
